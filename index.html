@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAO TRAVELS | Premium Travel Agency</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="bg-layer"></div>
+
+    <!-- 1. Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span><i class="fas fa-envelope"></i> contact@raotravels.com</span>
+            <span><i class="fas fa-phone-alt"></i> +91 98765 43210</span>
+        </div>
+        <div class="top-bar-right">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+        </div>
+    </div>
+
+    <!-- 2. Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="logo">RAO<span style="color: var(--text-primary); font-weight: 300;">TRAVELS</span></div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#packages">Packages</a></li>
+            <li><a href="#destinations">Destinations</a></li>
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="https://wa.me/919876543210?text=Hello%20RAO%20Travels,%20I%20want%20to%20enquire%20about%20a%20tour" target="_blank" class="btn-primary" style="display:inline-block;">Enquire Now</a>
+        </div>
+    </nav>
+
+    <!-- 3. Hero Section -->
+    <section class="hero" id="home">
+        <!-- Background Slides -->
+        <div class="hero-bg">
+            <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1526772662000-3f88f10405ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"></div>
+            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"></div>
+            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"></div>
+        </div>
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+            <h1>Discover <span class="typewriter" id="typewriter"></span></h1>
+            <p>Experience the ultimate luxury in travel. Where every journey becomes a timeless story.</p>
+            
+            <div class="search-bar">
+                <div class="search-input">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <input type="text" placeholder="Where to?">
+                </div>
+                <div class="search-input">
+                    <i class="fas fa-wallet"></i>
+                    <select>
+                        <option>Any Budget</option>
+                        <option>Standard</option>
+                        <option>Luxury</option>
+                    </select>
+                </div>
+                <button class="search-btn">Search Tours</button>
+            </div>
+
+            <div class="popular-searches">
+                <span class="chip">Ladakh</span>
+                <span class="chip">Bali</span>
+                <span class="chip">Kashmir</span>
+                <span class="chip">Maldives</span>
+                <span class="chip">Dubai</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Packages Section -->
+    <section class="section-padding" id="packages">
+        <div class="section-header reveal">
+            <span class="section-subtitle">Exclusive Offers</span>
+            <h2 class="section-title">Best Travel Packages</h2>
+        </div>
+
+        <div class="packages-filter reveal">
+            <button class="filter-btn active">All</button>
+            <button class="filter-btn">Honeymoon</button>
+            <button class="filter-btn">Adventure</button>
+            <button class="filter-btn">Family</button>
+        </div>
+
+        <div class="packages-grid">
+            <!-- Package 1 -->
+            <div class="package-card glass reveal">
+                <div class="discount-badge">20% OFF</div>
+                <img src="https://images.unsplash.com/photo-1544644181-1484b3fdfc62?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Himachal" class="package-img">
+                <div class="package-content">
+                    <h3 class="package-title">Mystic Himachal Retreat</h3>
+                    <div class="package-meta">
+                        <span><i class="far fa-clock"></i> 5 Days / 4 Nights</span>
+                        <span><i class="fas fa-star"></i> 4.9</span>
+                    </div>
+                    <div class="package-price">₹18,500 <span>₹23,000</span></div>
+                    <div class="package-actions">
+                        <button class="btn-outline">Details</button>
+                        <a href="https://wa.me/919876543210?text=Hello,%20I'm%20interested%20in%20booking%20the%20Mystic%20Himachal%20Retreat%20package!" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Package 2 -->
+            <div class="package-card glass reveal reveal-delay-1">
+                <div class="discount-badge">HOT DEAL</div>
+                <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Bali" class="package-img">
+                <div class="package-content">
+                    <h3 class="package-title">Romantic Bali Escapade</h3>
+                    <div class="package-meta">
+                        <span><i class="far fa-clock"></i> 6 Days / 5 Nights</span>
+                        <span><i class="fas fa-star"></i> 5.0</span>
+                    </div>
+                    <div class="package-price">₹45,000 <span>₹52,000</span></div>
+                    <div class="package-actions">
+                        <button class="btn-outline">Details</button>
+                        <a href="https://wa.me/919876543210?text=Hello,%20I'm%20interested%20in%20booking%20the%20Romantic%20Bali%20Escapade%20package!" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Package 3 -->
+            <div class="package-card glass reveal reveal-delay-2">
+                <img src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Kerala" class="package-img">
+                <div class="package-content">
+                    <h3 class="package-title">Kerala God's Own Country</h3>
+                    <div class="package-meta">
+                        <span><i class="far fa-clock"></i> 7 Days / 6 Nights</span>
+                        <span><i class="fas fa-star"></i> 4.8</span>
+                    </div>
+                    <div class="package-price">₹22,000 <span>₹25,000</span></div>
+                    <div class="package-actions">
+                        <button class="btn-outline">Details</button>
+                        <a href="https://wa.me/919876543210?text=Hello,%20I'm%20interested%20in%20booking%20the%20Kerala%20God's%20Own%20Country%20package!" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Top Destinations -->
+    <section class="section-padding" id="destinations">
+        <div class="section-header reveal">
+            <span class="section-subtitle">Explore The World</span>
+            <h2 class="section-title">Top Rated Destinations</h2>
+        </div>
+
+        <div class="destinations-grid">
+            <div class="dest-card reveal">
+                <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Goa">
+                <div class="dest-overlay">
+                    <h3 class="dest-title">Goa, India</h3>
+                    <div class="dest-count">12+ Packages</div>
+                </div>
+            </div>
+            <div class="dest-card reveal reveal-delay-1">
+                <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Dubai">
+                <div class="dest-overlay">
+                    <h3 class="dest-title">Dubai, UAE</h3>
+                    <div class="dest-count">8+ Packages</div>
+                </div>
+            </div>
+            <div class="dest-card reveal reveal-delay-2">
+                <img src="https://images.unsplash.com/photo-1582686115763-eb0429f6d71b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Maldives">
+                <div class="dest-overlay">
+                    <h3 class="dest-title">Maldives</h3>
+                    <div class="dest-count">5+ Packages</div>
+                </div>
+            </div>
+            <div class="dest-card reveal reveal-delay-3">
+                <img src="https://images.unsplash.com/photo-1566837945700-3005dea52769?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Kashmir">
+                <div class="dest-overlay">
+                    <h3 class="dest-title">Kashmir</h3>
+                    <div class="dest-count">15+ Packages</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Top Categories -->
+    <section class="section-padding" id="categories">
+        <div class="section-header reveal">
+            <span class="section-subtitle">Tailored For You</span>
+            <h2 class="section-title">Tour Categories</h2>
+        </div>
+
+        <div class="categories-tabs reveal">
+            <button class="tab-btn active" data-tab="group">Group Tours</button>
+            <button class="tab-btn" data-tab="honeymoon">Honeymoon</button>
+            <button class="tab-btn" data-tab="adventure">Adventure</button>
+        </div>
+
+        <!-- Group Tours -->
+        <div class="packages-grid tab-content active" id="tab-group">
+            <div class="package-card glass reveal">
+                <img src="https://images.unsplash.com/photo-1548013146-72479768bada?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Taj Mahal" class="package-img">
+                <div class="package-content">
+                    <h3 class="package-title">Golden Triangle Tour</h3>
+                    <div class="package-price">₹12,000</div>
+                    <div class="package-actions">
+                        <a href="https://wa.me/919876543210?text=Hello,%20I'm%20interested%20in%20the%20Golden%20Triangle%20Tour" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
+                    </div>
+                </div>
+            </div>
+            <div class="package-card glass reveal reveal-delay-1">
+                <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Rajasthan" class="package-img">
+                <div class="package-content">
+                    <h3 class="package-title">Royal Rajasthan Group</h3>
+                    <div class="package-price">₹15,500</div>
+                    <div class="package-actions">
+                        <a href="https://wa.me/919876543210?text=Hello,%20I'm%20interested%20in%20the%20Royal%20Rajasthan%20Group%20Tour" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
+                    </div>
+                </div>
+            </div>
+            <div class="package-card glass reveal reveal-delay-2">
+                <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Goa" class="package-img">
+                <div class="package-content">
+                    <h3 class="package-title">Goa Beach Party</h3>
+                    <div class="package-price">₹9,999</div>
+                    <div class="package-actions">
+                        <a href="https://wa.me/919876543210?text=Hello,%20I'm%20interested%20in%20the%20Goa%20Beach%20Party%20Tour" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Honeymoon Tours -->
+        <div class="packages-grid tab-content" id="tab-honeymoon">
+            <div class="package-card glass">
+                <img src="https://images.unsplash.com/photo-1582686115763-eb0429f6d71b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Maldives" class="package-img">
+                <div class="package-content">
+                    <h3 class="package-title">Maldives Overwater Bliss</h3>
+                    <div class="package-price">₹85,000</div>
+                    <div class="package-actions">
+                        <a href="https://wa.me/919876543210?text=Hello,%20I'm%20interested%20in%20the%20Maldives%20Overwater%20Bliss%20Honeymoon" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Adventure Tours -->
+        <div class="packages-grid tab-content" id="tab-adventure">
+            <div class="package-card glass">
+                <img src="https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Ladakh" class="package-img">
+                <div class="package-content">
+                    <h3 class="package-title">Ladakh Bike Expedition</h3>
+                    <div class="package-price">₹32,000</div>
+                    <div class="package-actions">
+                        <a href="https://wa.me/919876543210?text=Hello,%20I'm%20interested%20in%20the%20Ladakh%20Bike%20Expedition" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. Statistics -->
+    <section class="section-padding stats-section">
+        <div class="stats-grid" id="stats">
+            <div class="stat-item">
+                <div class="stat-circle"><span data-target="25000">0</span>+</div>
+                <div class="stat-label">Happy Clients</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-circle"><span data-target="50">0</span>+</div>
+                <div class="stat-label">Destinations</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-circle"><span data-target="1500">0</span>+</div>
+                <div class="stat-label">Tours Completed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-circle"><span data-target="15">0</span>+</div>
+                <div class="stat-label">Years Experience</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. Testimonials -->
+    <section class="section-padding" id="about">
+        <div class="section-header reveal">
+            <span class="section-subtitle">What They Say</span>
+            <h2 class="section-title">Client Testimonials</h2>
+        </div>
+
+        <div class="testimonials-slider">
+            <div class="testimonial-card glass">
+                <div class="testi-header">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="testi-avatar">
+                    <div>
+                        <div class="testi-name">Priya Sharma</div>
+                        <div class="testi-loc">Mumbai, India</div>
+                        <div class="testi-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    </div>
+                </div>
+                <p class="testi-text">"Our trip to Bali was perfectly organized by RAO Travels. Every detail was meticulously planned, and the luxury accommodations were breathtaking. Highly recommended!"</p>
+            </div>
+            
+            <div class="testimonial-card glass">
+                <div class="testi-header">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="testi-avatar">
+                    <div>
+                        <div class="testi-name">Rahul Verma</div>
+                        <div class="testi-loc">Delhi, India</div>
+                        <div class="testi-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
+                    </div>
+                </div>
+                <p class="testi-text">"The Kashmir package exceeded our expectations. The houseboats, the guides, and the seamless transfers made our family vacation truly unforgettable."</p>
+            </div>
+
+            <div class="testimonial-card glass">
+                <div class="testi-header">
+                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User" class="testi-avatar">
+                    <div>
+                        <div class="testi-name">Anita Desai</div>
+                        <div class="testi-loc">Bangalore, India</div>
+                        <div class="testi-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    </div>
+                </div>
+                <p class="testi-text">"From booking to return, the service was impeccable. RAO Travels gave us the premium experience we were looking for on our honeymoon."</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. Newsletter -->
+    <section class="section-padding">
+        <div class="newsletter-section glass reveal" style="padding: 60px; border-radius: 30px;">
+            <h2 class="section-title" style="font-size: 2.5rem; margin-bottom: 20px;">Get Special Offers</h2>
+            <p style="color: var(--text-muted); margin-bottom: 0;">Subscribe to our newsletter and get exclusive travel deals directly in your inbox.</p>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Enter your email address" required>
+                <button type="submit" class="btn-primary">Subscribe</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- 10. Footer -->
+    <footer class="footer" id="contact">
+        <div class="footer-grid">
+            <div class="footer-about">
+                <div class="logo">RAO<span style="color: var(--text-primary); font-weight: 300;">TRAVELS</span></div>
+                <p>Premium travel agency specializing in luxury domestic and international tours. Making every journey a timeless story since 2010.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links-col">
+                <h4 class="footer-title">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#packages">Tour Packages</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links-col">
+                <h4 class="footer-title">Top Destinations</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Kashmir</a></li>
+                    <li><a href="#">Bali</a></li>
+                    <li><a href="#">Dubai</a></li>
+                    <li><a href="#">Maldives</a></li>
+                    <li><a href="#">Kerala</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-contact-col">
+                <h4 class="footer-title">Contact Info</h4>
+                <ul class="footer-contact">
+                    <li><i class="fas fa-map-marker-alt"></i> 123 Luxury Avenue, Connaught Place, New Delhi, India 110001</li>
+                    <li><i class="fas fa-phone-alt"></i> +91 98765 43210<br>+91 11 2345 6789</li>
+                    <li><i class="fas fa-envelope"></i> info@raotravels.com</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 RAO TRAVELS. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
+</body>
+</html>

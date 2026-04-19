@@ -3,7 +3,7 @@
 //               and renders the full details page dynamically
 // ============================================================
 
-const API_BASE = 'http://localhost:5000/api/tours';
+const API_BASE = CONFIG.API_BASE + '/api/tours';
 
 // Format number as Indian currency
 const formatPrice = (price) => '₹' + Number(price).toLocaleString('en-IN');
@@ -120,7 +120,7 @@ loadTourDetails();
 //  Booking Form Submission
 // ============================================================
 
-const BOOKING_API = 'http://localhost:5000/api/bookings';
+const BOOKING_API = CONFIG.API_BASE + '/api/bookings';
 
 const setupBookingForm = () => {
     const form = document.getElementById('booking-form');

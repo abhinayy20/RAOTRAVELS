@@ -3,7 +3,7 @@
 //             Now with search & filter support
 // ============================================================
 
-const API_URL = 'http://localhost:5000/api/tours';
+const API_URL = CONFIG.API_BASE + '/api/tours';
 
 // Helper: Format numbers as Indian currency  
 const formatPrice = (price) => {

@@ -2,7 +2,7 @@
 //  admin.js — RAO Travels Admin Panel
 // ============================================================
 
-const API = 'http://localhost:5000/api';
+const API = CONFIG.API_BASE + '/api';
 const formatPrice = (p) => '₹' + Number(p).toLocaleString('en-IN');
 const formatDate = (d) => new Date(d).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
 

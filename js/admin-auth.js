@@ -2,7 +2,7 @@
 //  admin-auth.js — Handles login form & auth token management
 // ============================================================
 
-const AUTH_API = 'http://localhost:5000/api/admin';
+const AUTH_API = (typeof CONFIG !== 'undefined' ? CONFIG.API_BASE : 'http://localhost:5000') + '/api/admin';
 
 // ============================================================
 //  LOGIN PAGE LOGIC (runs on admin-login.html)

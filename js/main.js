@@ -12,47 +12,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Hero Slideshow
     const slides = document.querySelectorAll('.hero-slide');
-    let currentSlide = 0;
-    
-    setInterval(() => {
-        slides[currentSlide].classList.remove('active');
-        currentSlide = (currentSlide + 1) % slides.length;
-        slides[currentSlide].classList.add('active');
-    }, 5000); // Change image every 5 seconds
+    if (slides.length > 0) {
+        let currentSlide = 0;
+        
+        setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 5000); // Change image every 5 seconds
+    }
 
     // 3. Typewriter Effect
-    const words = ["The World", "Luxury", "Adventure", "Serenity"];
-    let wordIndex = 0;
-    let charIndex = 0;
-    let isDeleting = false;
     const typewriterElement = document.getElementById('typewriter');
+    if (typewriterElement) {
+        const words = ["The World", "Luxury", "Adventure", "Serenity"];
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
 
-    function typeEffect() {
-        const currentWord = words[wordIndex];
+        function typeEffect() {
+            const currentWord = words[wordIndex];
+            
+            if (isDeleting) {
+                typewriterElement.textContent = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typewriterElement.textContent = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 100 : 200;
+
+            if (!isDeleting && charIndex === currentWord.length) {
+                typeSpeed = 2000; // Pause at end of word
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                typeSpeed = 500; // Pause before new word
+            }
+
+            setTimeout(typeEffect, typeSpeed);
+        }
         
-        if (isDeleting) {
-            typewriterElement.textContent = currentWord.substring(0, charIndex - 1);
-            charIndex--;
-        } else {
-            typewriterElement.textContent = currentWord.substring(0, charIndex + 1);
-            charIndex++;
-        }
-
-        let typeSpeed = isDeleting ? 100 : 200;
-
-        if (!isDeleting && charIndex === currentWord.length) {
-            typeSpeed = 2000; // Pause at end of word
-            isDeleting = true;
-        } else if (isDeleting && charIndex === 0) {
-            isDeleting = false;
-            wordIndex = (wordIndex + 1) % words.length;
-            typeSpeed = 500; // Pause before new word
-        }
-
-        setTimeout(typeEffect, typeSpeed);
+        typeEffect();
     }
-    
-    typeEffect();
 
     // 4. Statistics Counter (Intersection Observer)
     const stats = document.querySelectorAll('.stat-circle span[data-target]');

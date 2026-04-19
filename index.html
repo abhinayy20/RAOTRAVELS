@@ -22,13 +22,13 @@
     <!-- 1. Top Bar -->
     <div class="top-bar">
         <div class="top-bar-left">
-            <span><i class="fas fa-envelope"></i> contact@raotravels.com</span>
-            <span><i class="fas fa-phone-alt"></i> +91 98765 43210</span>
+            <span><i class="fas fa-envelope"></i> yadavabhinay456@gmail.com</span>
+            <span><i class="fas fa-phone-alt"></i> +91 79858 15601</span>
         </div>
         <div class="top-bar-right">
-            <a href="#"><i class="fab fa-facebook-f"></i></a>
-            <a href="#"><i class="fab fa-instagram"></i></a>
-            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.instagram.com/"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.instagram.com/"><i class="fab fa-twitter"></i></a>
         </div>
     </div>
 
@@ -40,10 +40,10 @@
             <li><a href="#packages">Packages</a></li>
             <li><a href="#destinations">Destinations</a></li>
             <li><a href="#about">About Us</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li><a href="contact.html">Contact</a></li>
         </ul>
         <div class="nav-actions">
-            <a href="https://wa.me/919876543210?text=Hello%20RAO%20Travels,%20I%20want%20to%20enquire%20about%20a%20tour" target="_blank" class="btn-primary" style="display:inline-block;">Enquire Now</a>
+            <a href="https://wa.me/917985815601?text=Hello%20RAO%20Travels,%20I%20want%20to%20enquire%20about%20a%20tour" target="_blank" class="btn-primary" style="display:inline-block;">Enquire Now</a>
         </div>
     </nav>
 
@@ -61,28 +61,30 @@
             <h1>Discover <span class="typewriter" id="typewriter"></span></h1>
             <p>Experience the ultimate luxury in travel. Where every journey becomes a timeless story.</p>
             
-            <div class="search-bar">
+            <div class="search-bar" id="hero-search">
                 <div class="search-input">
                     <i class="fas fa-map-marker-alt"></i>
-                    <input type="text" placeholder="Where to?">
+                    <input type="text" id="search-location" placeholder="Where to?" autocomplete="off">
                 </div>
                 <div class="search-input">
                     <i class="fas fa-wallet"></i>
-                    <select>
-                        <option>Any Budget</option>
-                        <option>Standard</option>
-                        <option>Luxury</option>
+                    <select id="search-budget">
+                        <option value="">Any Budget</option>
+                        <option value="0-20000">Under ₹20,000</option>
+                        <option value="20000-50000">₹20,000 - ₹50,000</option>
+                        <option value="50000-100000">₹50,000 - ₹1,00,000</option>
+                        <option value="100000-999999">₹1,00,000+</option>
                     </select>
                 </div>
-                <button class="search-btn">Search Tours</button>
+                <button class="search-btn" id="search-btn">Search Tours</button>
             </div>
 
             <div class="popular-searches">
-                <span class="chip">Ladakh</span>
-                <span class="chip">Bali</span>
-                <span class="chip">Kashmir</span>
-                <span class="chip">Maldives</span>
-                <span class="chip">Dubai</span>
+                <span class="chip" data-search="Ladakh">Ladakh</span>
+                <span class="chip" data-search="Bali">Bali</span>
+                <span class="chip" data-search="Kashmir">Kashmir</span>
+                <span class="chip" data-search="Maldives">Maldives</span>
+                <span class="chip" data-search="Dubai">Dubai</span>
             </div>
         </div>
     </section>
@@ -101,58 +103,13 @@
             <button class="filter-btn">Family</button>
         </div>
 
-        <div class="packages-grid">
-            <!-- Package 1 -->
-            <div class="package-card glass reveal">
-                <div class="discount-badge">20% OFF</div>
-                <img src="https://images.unsplash.com/photo-1544644181-1484b3fdfc62?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Himachal" class="package-img">
-                <div class="package-content">
-                    <h3 class="package-title">Mystic Himachal Retreat</h3>
-                    <div class="package-meta">
-                        <span><i class="far fa-clock"></i> 5 Days / 4 Nights</span>
-                        <span><i class="fas fa-star"></i> 4.9</span>
-                    </div>
-                    <div class="package-price">₹18,500 <span>₹23,000</span></div>
-                    <div class="package-actions">
-                        <button class="btn-outline">Details</button>
-                        <a href="https://wa.me/919876543210?text=Hello,%20I'm%20interested%20in%20booking%20the%20Mystic%20Himachal%20Retreat%20package!" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Package 2 -->
-            <div class="package-card glass reveal reveal-delay-1">
-                <div class="discount-badge">HOT DEAL</div>
-                <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Bali" class="package-img">
-                <div class="package-content">
-                    <h3 class="package-title">Romantic Bali Escapade</h3>
-                    <div class="package-meta">
-                        <span><i class="far fa-clock"></i> 6 Days / 5 Nights</span>
-                        <span><i class="fas fa-star"></i> 5.0</span>
-                    </div>
-                    <div class="package-price">₹45,000 <span>₹52,000</span></div>
-                    <div class="package-actions">
-                        <button class="btn-outline">Details</button>
-                        <a href="https://wa.me/919876543210?text=Hello,%20I'm%20interested%20in%20booking%20the%20Romantic%20Bali%20Escapade%20package!" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Package 3 -->
-            <div class="package-card glass reveal reveal-delay-2">
-                <img src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Kerala" class="package-img">
-                <div class="package-content">
-                    <h3 class="package-title">Kerala God's Own Country</h3>
-                    <div class="package-meta">
-                        <span><i class="far fa-clock"></i> 7 Days / 6 Nights</span>
-                        <span><i class="fas fa-star"></i> 4.8</span>
-                    </div>
-                    <div class="package-price">₹22,000 <span>₹25,000</span></div>
-                    <div class="package-actions">
-                        <button class="btn-outline">Details</button>
-                        <a href="https://wa.me/919876543210?text=Hello,%20I'm%20interested%20in%20booking%20the%20Kerala%20God's%20Own%20Country%20package!" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
-                    </div>
-                </div>
+        <!-- Dynamic packages grid - populated from API -->
+        <div class="packages-grid" id="packages-grid">
+            <!-- Loading state -->
+            <div class="loading-cards">
+                <div class="skeleton-card glass"></div>
+                <div class="skeleton-card glass"></div>
+                <div class="skeleton-card glass"></div>
             </div>
         </div>
     </section>
@@ -217,7 +174,7 @@
                     <h3 class="package-title">Golden Triangle Tour</h3>
                     <div class="package-price">₹12,000</div>
                     <div class="package-actions">
-                        <a href="https://wa.me/919876543210?text=Hello,%20I'm%20interested%20in%20the%20Golden%20Triangle%20Tour" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
+                        <a href="https://wa.me/917985815601?text=Hello,%20I'm%20interested%20in%20the%20Golden%20Triangle%20Tour" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
                     </div>
                 </div>
             </div>
@@ -227,7 +184,7 @@
                     <h3 class="package-title">Royal Rajasthan Group</h3>
                     <div class="package-price">₹15,500</div>
                     <div class="package-actions">
-                        <a href="https://wa.me/919876543210?text=Hello,%20I'm%20interested%20in%20the%20Royal%20Rajasthan%20Group%20Tour" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
+                        <a href="https://wa.me/917985815601?text=Hello,%20I'm%20interested%20in%20the%20Royal%20Rajasthan%20Group%20Tour" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
                     </div>
                 </div>
             </div>
@@ -237,7 +194,7 @@
                     <h3 class="package-title">Goa Beach Party</h3>
                     <div class="package-price">₹9,999</div>
                     <div class="package-actions">
-                        <a href="https://wa.me/919876543210?text=Hello,%20I'm%20interested%20in%20the%20Goa%20Beach%20Party%20Tour" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
+                        <a href="https://wa.me/917985815601?text=Hello,%20I'm%20interested%20in%20the%20Goa%20Beach%20Party%20Tour" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
                     </div>
                 </div>
             </div>
@@ -251,7 +208,7 @@
                     <h3 class="package-title">Maldives Overwater Bliss</h3>
                     <div class="package-price">₹85,000</div>
                     <div class="package-actions">
-                        <a href="https://wa.me/919876543210?text=Hello,%20I'm%20interested%20in%20the%20Maldives%20Overwater%20Bliss%20Honeymoon" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
+                        <a href="https://wa.me/917985815601?text=Hello,%20I'm%20interested%20in%20the%20Maldives%20Overwater%20Bliss%20Honeymoon" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
                     </div>
                 </div>
             </div>
@@ -265,7 +222,7 @@
                     <h3 class="package-title">Ladakh Bike Expedition</h3>
                     <div class="package-price">₹32,000</div>
                     <div class="package-actions">
-                        <a href="https://wa.me/919876543210?text=Hello,%20I'm%20interested%20in%20the%20Ladakh%20Bike%20Expedition" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
+                        <a href="https://wa.me/917985815601?text=Hello,%20I'm%20interested%20in%20the%20Ladakh%20Bike%20Expedition" target="_blank" class="btn-primary" style="flex:1; text-align:center;">Book</a>
                     </div>
                 </div>
             </div>
@@ -359,10 +316,10 @@
                 <div class="logo">RAO<span style="color: var(--text-primary); font-weight: 300;">TRAVELS</span></div>
                 <p>Premium travel agency specializing in luxury domestic and international tours. Making every journey a timeless story since 2010.</p>
                 <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.instagram.com/"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.instagram.com/"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.instagram.com/"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
             
@@ -391,9 +348,9 @@
             <div class="footer-contact-col">
                 <h4 class="footer-title">Contact Info</h4>
                 <ul class="footer-contact">
-                    <li><i class="fas fa-map-marker-alt"></i> 123 Luxury Avenue, Connaught Place, New Delhi, India 110001</li>
-                    <li><i class="fas fa-phone-alt"></i> +91 98765 43210<br>+91 11 2345 6789</li>
-                    <li><i class="fas fa-envelope"></i> info@raotravels.com</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Basti, Uttar Pradesh 272002</li>
+                    <li><i class="fas fa-phone-alt"></i> +91 79858 15601</li>
+                    <li><i class="fas fa-envelope"></i> yadavabhinay456@gmail.com</li>
                 </ul>
             </div>
         </div>
@@ -405,5 +362,6 @@
 
     <!-- Scripts -->
     <script src="js/main.js"></script>
+    <script src="js/fetch.js"></script>
 </body>
 </html>

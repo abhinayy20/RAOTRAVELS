@@ -1,0 +1,42 @@
+[
+    {
+        "title": "Mystic Himachal Retreat",
+        "price": 18500,
+        "location": "Himachal Pradesh, India",
+        "duration": "5 Days / 4 Nights",
+        "images": ["https://images.unsplash.com/photo-1544644181-1484b3fdfc62?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"],
+        "description": "Experience the majestic Himalayas with our Mystic Himachal Retreat. This carefully curated 5-day journey takes you through the colonial charm of Shimla and the breathtaking valleys of Manali. Perfect for nature lovers and thrill-seekers alike, this tour promises an unforgettable blend of serene landscapes and rich cultural heritage.",
+        "category": "Standard",
+        "rating": 4.9
+    },
+    {
+        "title": "Romantic Bali Escapade",
+        "price": 45000,
+        "location": "Bali, Indonesia",
+        "duration": "6 Days / 5 Nights",
+        "images": ["https://images.unsplash.com/photo-1537996194471-e657df975ab4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"],
+        "description": "Discover the magic of Bali on this romantic 6-day escapade. Relax on pristine beaches, explore ancient temples, and immerse yourself in the vibrant local culture. Perfect for couples seeking a blend of adventure and relaxation.",
+        "category": "Honeymoon",
+        "rating": 5.0
+    },
+    {
+        "title": "Kerala God's Own Country",
+        "price": 22000,
+        "location": "Kerala, India",
+        "duration": "7 Days / 6 Nights",
+        "images": ["https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"],
+        "description": "Sail through the tranquil backwaters, walk amidst lush tea gardens, and relax on golden beaches. This 7-day Kerala tour offers a diverse and rejuvenating experience in God's Own Country.",
+        "category": "Standard",
+        "rating": 4.8
+    },
+    {
+        "title": "Ladakh Bike Expedition",
+        "price": 32000,
+        "location": "Ladakh, India",
+        "duration": "9 Days / 8 Nights",
+        "images": ["https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"],
+        "description": "Rev up your engines for the ultimate adventure! Ride through the rugged terrains, high-altitude passes, and pristine lakes of Ladakh on this thrilling 9-day bike expedition.",
+        "category": "Adventure",
+        "rating": 4.7
+    }
+]

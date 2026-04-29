@@ -20,14 +20,16 @@ app.use(cors({
 }));
 
 // Route files
-const tourRoutes = require('./routes/tourRoutes');
+const tourRoutes    = require('./routes/tourRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
-const adminRoutes = require('./routes/adminRoutes');
+const adminRoutes   = require('./routes/adminRoutes');
+const aiRoutes      = require('./routes/aiRoutes');
 
 // Mount routers
-app.use('/api/tours', tourRoutes);
+app.use('/api/tours',    tourRoutes);
 app.use('/api/bookings', bookingRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/api/admin',    adminRoutes);
+app.use('/api/ai',       aiRoutes);
 
 // Root route
 app.get('/', (req, res) => {

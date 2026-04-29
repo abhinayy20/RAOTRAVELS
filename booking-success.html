@@ -134,6 +134,68 @@
         @keyframes spin {
             100% { transform: rotate(360deg); }
         }
+
+        /* ---- Workflow Status Tracker ---- */
+        .workflow-track {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 0;
+            margin: 28px 0 10px;
+            padding: 20px 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.07);
+            overflow-x: auto;
+        }
+        .workflow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            flex: 1;
+            min-width: 80px;
+        }
+        .wf-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            z-index: 1;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .wf-line {
+            position: absolute;
+            top: 21px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            z-index: 0;
+        }
+        .wf-line.done { background: #00d4b4; }
+        .wf-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #e6e8ec;
+            margin-top: 10px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .wf-sublabel {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 3px;
+        }
+        .workflow-step.done .wf-label  { color: #00d4b4; }
+        .workflow-step.rejected .wf-label { color: #ff4d4d; }
     </style>
 </head>
 <body>
@@ -191,19 +253,58 @@
             });
         };
 
+        // ---- Workflow step helper ----
+        const stepStatus = (booking) => {
+            const s = booking.status;
+            const vs = booking.vendorStatus || 'Pending';
+            // step states: 0=pending, 1=done, 2=rejected
+            const submitted = 1;
+            const admin = s === 'Approved' || s === 'Confirmed' ? 1 : s === 'Rejected' ? 2 : 0;
+            const vendor = vs === 'Accepted' ? 1 : vs === 'Rejected' ? 2 : 0;
+            const confirmed = s === 'Confirmed' ? 1 : 0;
+            const steps = [
+                { label: 'Submitted', sublabel: 'Booking received', state: submitted, icon: 'fa-paper-plane' },
+                { label: 'Admin Review', sublabel: admin === 1 ? 'Approved' : admin === 2 ? 'Rejected' : 'Pending review', state: admin, icon: 'fa-user-shield' },
+                { label: 'Vendor Confirmation', sublabel: vendor === 1 ? 'Accepted' : vendor === 2 ? 'Rejected' : 'Awaiting vendor', state: vendor, icon: 'fa-handshake' },
+                { label: 'Confirmed', sublabel: confirmed ? 'Trip confirmed!' : 'Pending', state: confirmed, icon: 'fa-check-double' },
+            ];
+            const colors = { 0: '#8b95a5', 1: '#00d4b4', 2: '#ff4d4d' };
+            const icons  = { 0: 'fa-clock', 1: 'fa-check', 2: 'fa-times' };
+            return `<div class="workflow-track">
+                ${steps.map((step, i) => `
+                    <div class="workflow-step ${step.state === 1 ? 'done' : step.state === 2 ? 'rejected' : ''}">
+                        <div class="wf-icon" style="background:${colors[step.state]}22;border-color:${colors[step.state]};">
+                            <i class="fas ${step.state > 0 ? icons[step.state] : step.icon}" style="color:${colors[step.state]};"></i>
+                        </div>
+                        ${i < steps.length - 1 ? `<div class="wf-line ${step.state === 1 ? 'done' : ''}"></div>` : ''}
+                        <div class="wf-label">${step.label}</div>
+                        <div class="wf-sublabel">${step.sublabel}</div>
+                    </div>
+                `).join('')}
+            </div>`;
+        };
+
         const renderSuccess = (booking) => {
             const card = document.getElementById('success-card');
             const tourName = booking.tourId ? booking.tourId.title : 'Tour';
             const tourLocation = booking.tourId ? booking.tourId.location : '';
+            const isRejected = booking.status === 'Rejected';
 
             card.innerHTML = `
-                <div class="success-icon">
-                    <i class="fas fa-check"></i>
+                <div class="success-icon" style="${isRejected ? 'background:rgba(255,77,77,0.1);' : ''}">
+                    <i class="fas ${isRejected ? 'fa-times' : 'fa-check'}" style="${isRejected ? 'color:#ff4d4d;' : ''}"></i>
                 </div>
-                <h1 class="success-title">Booking Confirmed!</h1>
-                <p class="success-subtitle">Thank you, ${booking.name}! Your booking has been received successfully.</p>
+                <h1 class="success-title" style="${isRejected ? 'color:#ff4d4d;' : ''}">${isRejected ? 'Booking Rejected' : 'Booking Received!'}</h1>
+                <p class="success-subtitle">
+                    ${isRejected
+                        ? 'Sorry, this booking was not approved. Please contact us for assistance.'
+                        : `Thank you, <strong>${booking.name}</strong>! Your booking is being processed.`}
+                </p>
+
+                <!-- Workflow Status Pipeline -->
+                ${stepStatus(booking)}
                 
-                <div class="booking-details">
+                <div class="booking-details" style="margin-top:24px;">
                     <div class="detail-row">
                         <span class="detail-label">Booking ID</span>
                         <span class="detail-value highlight">${booking._id}</span>
@@ -229,15 +330,22 @@
                         <span class="detail-value highlight">${formatPrice(booking.totalPrice)}</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Status</span>
-                        <span class="detail-value" style="color: var(--teal);">✓ ${booking.status}</span>
+                        <span class="detail-label">Booking Status</span>
+                        <span class="detail-value" style="color:${booking.status==='Confirmed'?'#00d4b4':booking.status==='Rejected'?'#ff4d4d':'#fbbf24'}">
+                            ${booking.status}
+                        </span>
                     </div>
+                    ${booking.assignedVendor ? `
+                    <div class="detail-row">
+                        <span class="detail-label">Assigned Vendor</span>
+                        <span class="detail-value">${booking.assignedVendor}</span>
+                    </div>` : ''}
                 </div>
                 
                 <div class="success-actions">
                     <a href="index.html" class="btn-outline">← Back Home</a>
-                    <a href="https://wa.me/917985815601?text=Hello,%20my%20booking%20ID%20is%20${booking._id}.%20Please%20confirm." target="_blank" class="btn-primary">
-                        <i class="fab fa-whatsapp"></i> Confirm via WhatsApp
+                    <a href="https://wa.me/917985815601?text=Hello,%20my%20booking%20ID%20is%20${booking._id}.%20I%20need%20an%20update." target="_blank" class="btn-primary">
+                        <i class="fab fa-whatsapp"></i> Contact on WhatsApp
                     </a>
                 </div>
             `;

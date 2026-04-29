@@ -1,10 +1,10 @@
 // ============================================================
-//  admin.js — RAO Travels Admin Panel
+//  admin.js — RAO Travels Admin Panel (with workflow actions)
 // ============================================================
 
 const API = CONFIG.API_BASE + '/api';
 const formatPrice = (p) => '₹' + Number(p).toLocaleString('en-IN');
-const formatDate = (d) => new Date(d).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+const formatDate  = (d) => new Date(d).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
 
 // ============================================================
 //  Toast Notifications
@@ -13,16 +13,49 @@ const showToast = (msg, type = 'success') => {
     const toast = document.getElementById('toast');
     toast.className = `toast ${type} show`;
     toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
-    setTimeout(() => toast.classList.remove('show'), 3000);
+    setTimeout(() => toast.classList.remove('show'), 3500);
 };
+
+// ============================================================
+//  Status badge helper
+// ============================================================
+const statusBadge = (status) => {
+    const map = {
+        Pending:   { cls: 'badge-pending',   icon: 'fa-clock' },
+        Approved:  { cls: 'badge-approved',  icon: 'fa-thumbs-up' },
+        Rejected:  { cls: 'badge-rejected',  icon: 'fa-times-circle' },
+        Confirmed: { cls: 'badge-confirmed', icon: 'fa-check-circle' },
+        Cancelled: { cls: 'badge-rejected',  icon: 'fa-ban' },
+    };
+    const s = map[status] || map.Pending;
+    return `<span class="status-badge ${s.cls}"><i class="fas ${s.icon}"></i> ${status}</span>`;
+};
+
+const vendorBadge = (status) => {
+    const map = {
+        Pending:  { cls: 'badge-pending',   icon: 'fa-clock' },
+        Accepted: { cls: 'badge-confirmed', icon: 'fa-check' },
+        Rejected: { cls: 'badge-rejected',  icon: 'fa-times' },
+    };
+    const s = map[status] || map.Pending;
+    return `<span class="status-badge ${s.cls}"><i class="fas ${s.icon}"></i> ${status}</span>`;
+};
+
+// ============================================================
+//  Auth header
+// ============================================================
+const authHeader = () => ({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+});
 
 // ============================================================
 //  Tab Navigation
 // ============================================================
-const navItems = document.querySelectorAll('.nav-item');
+const navItems   = document.querySelectorAll('.nav-item');
 const tabContents = document.querySelectorAll('.tab-content');
-const pageTitle = document.getElementById('page-title');
-const tabNames = { dashboard: 'Dashboard', tours: 'Manage Tours', bookings: 'Bookings' };
+const pageTitle  = document.getElementById('page-title');
+const tabNames   = { dashboard: 'Dashboard', tours: 'Manage Tours', bookings: 'Bookings' };
 
 navItems.forEach(item => {
     item.addEventListener('click', (e) => {
@@ -33,12 +66,10 @@ navItems.forEach(item => {
         const tab = item.getAttribute('data-tab');
         document.getElementById(`tab-${tab}`).classList.add('active');
         pageTitle.textContent = tabNames[tab] || 'Dashboard';
-        // Close sidebar on mobile
         document.getElementById('sidebar').classList.remove('open');
     });
 });
 
-// Mobile menu toggle
 document.getElementById('menu-toggle').addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('open');
 });
@@ -50,23 +81,30 @@ const loadDashboard = async () => {
     try {
         const [toursRes, bookingsRes] = await Promise.all([
             fetch(`${API}/tours`).then(r => r.json()),
-            fetch(`${API}/bookings`).then(r => r.json())
+            fetch(`${API}/bookings`, { headers: authHeader() }).then(r => r.json())
         ]);
 
-        const tours = toursRes.data || [];
+        const tours    = toursRes.data    || [];
         const bookings = bookingsRes.data || [];
 
-        document.getElementById('stat-tours').textContent = tours.length;
+        document.getElementById('stat-tours').textContent    = tours.length;
         document.getElementById('stat-bookings').textContent = bookings.length;
 
-        const confirmed = bookings.filter(b => b.status === 'Confirmed');
-        document.getElementById('stat-confirmed').textContent = confirmed.length;
+        const pending  = bookings.filter(b => b.status === 'Pending').length;
+        const approved = bookings.filter(b => b.status === 'Approved').length;
+        const confirmed = bookings.filter(b => b.status === 'Confirmed').length;
 
-        const revenue = confirmed.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+        document.getElementById('stat-pending').textContent   = pending;
+        document.getElementById('stat-approved').textContent  = approved;
+        document.getElementById('stat-confirmed').textContent = confirmed;
+
+        const revenue = bookings
+            .filter(b => b.status === 'Confirmed')
+            .reduce((sum, b) => sum + (b.totalPrice || 0), 0);
         document.getElementById('stat-revenue').textContent = formatPrice(revenue);
 
-        // Recent bookings (last 5)
-        const recent = bookings.slice(0, 5);
+        // Recent bookings table
+        const recent    = bookings.slice(0, 5);
         const recentDiv = document.getElementById('recent-bookings');
 
         if (recent.length === 0) {
@@ -77,16 +115,18 @@ const loadDashboard = async () => {
         recentDiv.innerHTML = `
             <table>
                 <thead><tr>
-                    <th>Name</th><th>Tour</th><th>Date</th><th>Amount</th><th>Status</th>
+                    <th>Name</th><th>Tour</th><th>Date</th><th>Amount</th>
+                    <th>Status</th><th>Vendor</th>
                 </tr></thead>
                 <tbody>
                     ${recent.map(b => `
                         <tr>
-                            <td>${b.name}</td>
+                            <td><strong>${b.name}</strong></td>
                             <td>${b.tourId ? b.tourId.title : 'N/A'}</td>
                             <td>${formatDate(b.date)}</td>
                             <td>${formatPrice(b.totalPrice || 0)}</td>
-                            <td><span class="status-select ${b.status}" style="cursor:default;">${b.status}</span></td>
+                            <td>${statusBadge(b.status)}</td>
+                            <td>${vendorBadge(b.vendorStatus || 'Pending')}</td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -104,13 +144,13 @@ let editingTourId = null;
 
 const loadTours = async () => {
     try {
-        const res = await fetch(`${API}/tours`);
+        const res  = await fetch(`${API}/tours`);
         const json = await res.json();
         const tours = json.data || [];
         const tbody = document.getElementById('tours-table-body');
 
         if (tours.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">No tours found. Add one above.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">No tours found. Add one above.</td></tr>';
             return;
         }
 
@@ -134,17 +174,16 @@ const loadTours = async () => {
     }
 };
 
-// Handle tour form submission (Create or Update)
 document.getElementById('tour-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const tourData = {
-        title: document.getElementById('t-title').value.trim(),
-        price: Number(document.getElementById('t-price').value),
-        location: document.getElementById('t-location').value.trim(),
-        duration: document.getElementById('t-duration').value.trim(),
-        category: document.getElementById('t-category').value,
-        images: [document.getElementById('t-image').value.trim()],
+        title:       document.getElementById('t-title').value.trim(),
+        price:       Number(document.getElementById('t-price').value),
+        location:    document.getElementById('t-location').value.trim(),
+        duration:    document.getElementById('t-duration').value.trim(),
+        category:    document.getElementById('t-category').value,
+        images:      [document.getElementById('t-image').value.trim()],
         description: document.getElementById('t-description').value.trim()
     };
 
@@ -153,25 +192,14 @@ document.getElementById('tour-form').addEventListener('submit', async (e) => {
     submitBtn.disabled = true;
 
     try {
-        let url = `${API}/tours`;
-        let method = 'POST';
-
-        if (editingTourId) {
-            url = `${API}/tours/${editingTourId}`;
-            method = 'PUT';
-        }
-
-        const res = await fetch(url, {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(tourData)
-        });
-
-        const json = await res.json();
+        const url    = editingTourId ? `${API}/tours/${editingTourId}` : `${API}/tours`;
+        const method = editingTourId ? 'PUT' : 'POST';
+        const res    = await fetch(url, { method, headers: authHeader(), body: JSON.stringify(tourData) });
+        const json   = await res.json();
 
         if (!res.ok || !json.success) throw new Error(json.message || 'Save failed');
 
-        showToast(editingTourId ? 'Tour updated successfully!' : 'Tour created successfully!');
+        showToast(editingTourId ? 'Tour updated!' : 'Tour created!');
         cancelEdit();
         document.getElementById('tour-form').reset();
         loadTours();
@@ -185,28 +213,24 @@ document.getElementById('tour-form').addEventListener('submit', async (e) => {
     }
 });
 
-// Edit tour — load data into form
 window.editTour = async (id) => {
     try {
-        const res = await fetch(`${API}/tours/${id}`);
+        const res  = await fetch(`${API}/tours/${id}`);
         const json = await res.json();
-        const t = json.data;
+        const t    = json.data;
 
         editingTourId = id;
-        document.getElementById('edit-tour-id').value = id;
-        document.getElementById('t-title').value = t.title;
-        document.getElementById('t-price').value = t.price;
-        document.getElementById('t-location').value = t.location;
-        document.getElementById('t-duration').value = t.duration;
-        document.getElementById('t-category').value = t.category || 'Standard';
-        document.getElementById('t-image').value = (t.images && t.images[0]) || '';
+        document.getElementById('t-title').value       = t.title;
+        document.getElementById('t-price').value       = t.price;
+        document.getElementById('t-location').value    = t.location;
+        document.getElementById('t-duration').value    = t.duration;
+        document.getElementById('t-category').value    = t.category || 'Standard';
+        document.getElementById('t-image').value       = (t.images && t.images[0]) || '';
         document.getElementById('t-description').value = t.description;
 
-        document.getElementById('form-title').innerHTML = '<i class="fas fa-edit"></i> Edit Tour';
-        document.getElementById('cancel-edit').style.display = 'inline-flex';
-        document.getElementById('submit-btn').innerHTML = '<i class="fas fa-save"></i> Update Tour';
-
-        // Scroll to form
+        document.getElementById('form-title').innerHTML       = '<i class="fas fa-edit"></i> Edit Tour';
+        document.getElementById('cancel-edit').style.display  = 'inline-flex';
+        document.getElementById('submit-btn').innerHTML        = '<i class="fas fa-save"></i> Update Tour';
         document.getElementById('tour-form').scrollIntoView({ behavior: 'smooth' });
 
     } catch (err) {
@@ -214,27 +238,21 @@ window.editTour = async (id) => {
     }
 };
 
-// Cancel edit — reset form state
 window.cancelEdit = () => {
     editingTourId = null;
-    document.getElementById('edit-tour-id').value = '';
     document.getElementById('tour-form').reset();
-    document.getElementById('form-title').innerHTML = '<i class="fas fa-plus-circle"></i> Add New Tour';
+    document.getElementById('form-title').innerHTML      = '<i class="fas fa-plus-circle"></i> Add New Tour';
     document.getElementById('cancel-edit').style.display = 'none';
-    document.getElementById('submit-btn').innerHTML = '<i class="fas fa-save"></i> Save Tour';
+    document.getElementById('submit-btn').innerHTML       = '<i class="fas fa-save"></i> Save Tour';
 };
 
-// Delete tour
 window.deleteTour = async (id) => {
-    if (!confirm('Are you sure you want to delete this tour? This cannot be undone.')) return;
-
+    if (!confirm('Delete this tour? This cannot be undone.')) return;
     try {
-        const res = await fetch(`${API}/tours/${id}`, { method: 'DELETE' });
+        const res  = await fetch(`${API}/tours/${id}`, { method: 'DELETE', headers: authHeader() });
         const json = await res.json();
-
         if (!res.ok || !json.success) throw new Error(json.message || 'Delete failed');
-
-        showToast('Tour deleted successfully!');
+        showToast('Tour deleted!');
         loadTours();
         loadDashboard();
     } catch (err) {
@@ -243,35 +261,51 @@ window.deleteTour = async (id) => {
 };
 
 // ============================================================
-//  BOOKINGS MANAGEMENT
+//  BOOKINGS MANAGEMENT — with Approve / Reject workflow
 // ============================================================
 const loadBookings = async () => {
     try {
-        const res = await fetch(`${API}/bookings`);
-        const json = await res.json();
+        const res     = await fetch(`${API}/bookings`, { headers: authHeader() });
+        const json    = await res.json();
         const bookings = json.data || [];
-        const tbody = document.getElementById('bookings-table-body');
+        const tbody   = document.getElementById('bookings-table-body');
 
         if (bookings.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--text-muted);">No bookings yet.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text-muted);">No bookings yet.</td></tr>';
             return;
         }
 
         tbody.innerHTML = bookings.map(b => `
-            <tr>
-                <td><strong>${b.name}</strong></td>
-                <td>${b.email}</td>
+            <tr id="row-${b._id}">
+                <td><strong>${b.name}</strong><br><small style="color:var(--text-muted);">${b.email}</small></td>
                 <td>${b.phone}</td>
                 <td>${b.tourId ? b.tourId.title : 'Deleted Tour'}</td>
                 <td>${formatDate(b.date)}</td>
                 <td>${b.travelers}</td>
                 <td>${formatPrice(b.totalPrice || 0)}</td>
+                <td>${statusBadge(b.status)}</td>
+                <td>${vendorBadge(b.vendorStatus || 'Pending')}</td>
+                <td><span class="vendor-label">${b.assignedVendor || '—'}</span></td>
                 <td>
-                    <select class="status-select ${b.status}" onchange="updateBookingStatus('${b._id}', this.value, this)">
-                        <option value="Pending" ${b.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                        <option value="Confirmed" ${b.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
-                        <option value="Cancelled" ${b.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
-                    </select>
+                    <div class="action-btns">
+                        ${b.status === 'Pending' ? `
+                            <button class="btn btn-sm btn-approve" onclick="adminBookingAction('${b._id}', 'approve')">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                            <button class="btn btn-sm btn-delete" onclick="adminBookingAction('${b._id}', 'reject')">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                        ` : b.status === 'Approved' ? `
+                            <span style="color:var(--teal);font-size:0.82rem;"><i class="fas fa-hourglass-half"></i> Awaiting Vendor</span>
+                            <button class="btn btn-sm btn-delete" onclick="adminBookingAction('${b._id}', 'reject')" style="margin-top:4px;">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                        ` : b.status === 'Confirmed' ? `
+                            <span style="color:#00d4b4;font-size:0.82rem;"><i class="fas fa-check-double"></i> Confirmed</span>
+                        ` : `
+                            <span style="color:#ff4d4d;font-size:0.82rem;"><i class="fas fa-times-circle"></i> ${b.status}</span>
+                        `}
+                    </div>
                 </td>
             </tr>
         `).join('');
@@ -280,23 +314,29 @@ const loadBookings = async () => {
     }
 };
 
-// Update booking status
-window.updateBookingStatus = async (id, status, selectEl) => {
+// Admin Approve / Reject
+window.adminBookingAction = async (id, action) => {
+    const label = action === 'approve' ? 'Approve' : 'Reject';
+    let assignedVendor = '';
+
+    if (action === 'approve') {
+        assignedVendor = prompt('Assign vendor name (optional):', 'RAO Travels Local Team') || '';
+    }
+
+    if (!confirm(`${label} this booking?`)) return;
+
     try {
-        const res = await fetch(`${API}/bookings/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status })
+        const res = await fetch(`${API}/bookings/${id}/admin-action`, {
+            method:  'PUT',
+            headers: authHeader(),
+            body:    JSON.stringify({ action, assignedVendor })
         });
-
         const json = await res.json();
-        if (!res.ok || !json.success) throw new Error(json.message || 'Update failed');
+        if (!res.ok || !json.success) throw new Error(json.message || 'Action failed');
 
-        // Update dropdown color
-        selectEl.className = `status-select ${status}`;
-        showToast(`Booking ${status.toLowerCase()} successfully!`);
+        showToast(`Booking ${action === 'approve' ? 'Approved' : 'Rejected'} successfully!`);
+        loadBookings();
         loadDashboard();
-
     } catch (err) {
         showToast(err.message, 'error');
     }

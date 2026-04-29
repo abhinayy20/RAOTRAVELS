@@ -302,20 +302,28 @@ tbody tr:hover { background: rgba(255,255,255,0.02); }
 
 .action-btns { display: flex; gap: 8px; }
 
-/* ---- Status Badges & Select ---- */
-.status-select {
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-size: 0.8rem;
+/* ---- Status Badges ---- */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
     font-weight: 600;
-    border: none;
-    cursor: pointer;
-    outline: none;
+    white-space: nowrap;
 }
 
-.status-select.Pending { background: rgba(251,191,36,0.15); color: var(--warning); }
-.status-select.Confirmed { background: rgba(52,211,153,0.15); color: var(--success); }
-.status-select.Cancelled { background: rgba(255,77,77,0.15); color: var(--danger); }
+.badge-pending  { background: rgba(251,191,36,0.15);  color: #fbbf24; }
+.badge-approved { background: rgba(102,126,234,0.15); color: #667eea; }
+.badge-rejected { background: rgba(255,77,77,0.15);   color: #ff4d4d; }
+.badge-confirmed{ background: rgba(0,212,180,0.15);   color: #00d4b4; }
+
+/* Approve button */
+.btn-approve { background: rgba(0,212,180,0.12); color: #00d4b4; border: none; }
+.btn-approve:hover { background: rgba(0,212,180,0.25); }
+
+.vendor-label { font-size: 0.8rem; color: var(--text-muted); }
 
 /* ---- Toast ---- */
 .toast {

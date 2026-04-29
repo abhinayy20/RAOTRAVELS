@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Destinations | RAO TRAVELS</title>
+    <meta name="description" content="Explore all tour packages by RAO Travels. Filter by destination or category and find your perfect getaway.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/destinations.css">
+</head>
+<body>
+    <div class="bg-layer"></div>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span><i class="fas fa-envelope"></i> yadavabhinay456@gmail.com</span>
+            <span><i class="fas fa-phone-alt"></i> +91 79858 15601</span>
+        </div>
+        <div class="top-bar-right">
+            <a href="https://www.instagram.com/"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.instagram.com/"><i class="fab fa-twitter"></i></a>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo">RAO<span style="color: var(--text-primary); font-weight: 300;">TRAVELS</span></a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#packages">Packages</a></li>
+            <li><a href="destinations.html" class="nav-active">Destinations</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="https://wa.me/917985815601?text=Hello%20RAO%20Travels,%20I%20want%20to%20enquire%20about%20a%20tour" target="_blank" class="btn-primary" style="display:inline-block;">Enquire Now</a>
+        </div>
+    </nav>
+
+    <!-- Page Hero -->
+    <div class="page-hero dest-hero">
+        <div class="hero-overlay"></div>
+        <div class="page-hero-content reveal">
+            <span class="section-subtitle">Explore The World</span>
+            <h1>All Destinations</h1>
+            <div class="breadcrumbs">
+                <a href="index.html">Home</a> <i class="fas fa-chevron-right"></i>
+                <span>Destinations</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <section class="dest-controls-section">
+        <div class="dest-controls glass">
+
+            <!-- Text Search -->
+            <div class="dest-search-wrap">
+                <i class="fas fa-search dest-search-icon"></i>
+                <input
+                    type="text"
+                    id="dest-search-input"
+                    class="dest-search-input"
+                    placeholder="Search by location (e.g. Kashmir, Bali…)"
+                    autocomplete="off"
+                >
+                <button id="dest-search-btn" class="btn-primary dest-search-btn">Search</button>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="dest-filter-wrap">
+                <button class="filter-btn active" data-category="all" id="filter-all">All</button>
+                <button class="filter-btn" data-category="Honeymoon">Honeymoon</button>
+                <button class="filter-btn" data-category="Adventure">Adventure</button>
+                <button class="filter-btn" data-category="Family">Family</button>
+                <button class="filter-btn" data-category="Group">Group</button>
+                <button class="filter-btn" data-category="International">International</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tours Grid -->
+    <section class="section-padding dest-grid-section">
+        <!-- Result count -->
+        <div class="dest-result-info" id="dest-result-info" style="display:none;">
+            <span id="dest-result-count"></span>
+            <button id="dest-clear-btn" class="dest-clear-btn">
+                <i class="fas fa-times"></i> Clear filters
+            </button>
+        </div>
+
+        <!-- Grid populated by JS -->
+        <div class="packages-grid" id="dest-grid">
+            <div class="loading-cards">
+                <div class="skeleton-card glass"></div>
+                <div class="skeleton-card glass"></div>
+                <div class="skeleton-card glass"></div>
+                <div class="skeleton-card glass"></div>
+                <div class="skeleton-card glass"></div>
+                <div class="skeleton-card glass"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="footer-grid">
+            <div class="footer-about">
+                <div class="logo">RAO<span style="color: var(--text-primary); font-weight: 300;">TRAVELS</span></div>
+                <p>Premium travel agency specializing in luxury domestic and international tours. Making every journey a timeless story since 2010.</p>
+                <div class="social-icons">
+                    <a href="https://www.instagram.com/"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.instagram.com/"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.instagram.com/"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-links-col">
+                <h4 class="footer-title">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="destinations.html">Destinations</a></li>
+                    <li><a href="index.html#packages">Tour Packages</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-col">
+                <h4 class="footer-title">Top Destinations</h4>
+                <ul class="footer-links">
+                    <li><a href="destinations.html">Kashmir</a></li>
+                    <li><a href="destinations.html">Bali</a></li>
+                    <li><a href="destinations.html">Dubai</a></li>
+                    <li><a href="destinations.html">Maldives</a></li>
+                    <li><a href="destinations.html">Kerala</a></li>
+                </ul>
+            </div>
+            <div class="footer-contact-col">
+                <h4 class="footer-title">Contact Info</h4>
+                <ul class="footer-contact">
+                    <li><i class="fas fa-map-marker-alt"></i> Basti, Uttar Pradesh 272002</li>
+                    <li><i class="fas fa-phone-alt"></i> +91 79858 15601</li>
+                    <li><i class="fas fa-envelope"></i> yadavabhinay456@gmail.com</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 RAO TRAVELS. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/destinations.js"></script>
+</body>
+</html>

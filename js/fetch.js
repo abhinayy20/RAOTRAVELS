@@ -65,8 +65,8 @@ const showError = (grid) => {
         ">
             <i class="fas fa-exclamation-circle" style="font-size:3rem; color: var(--gold); margin-bottom:15px; display:block;"></i>
             <h3 style="color: var(--text-primary); margin-bottom:10px;">Could Not Load Tours</h3>
-            <p>Make sure the backend server is running on port 5000.<br>
-            <code style="color: var(--teal);">cd backend && npm run dev</code></p>
+            <p>Unable to reach the backend. Please try again in a moment.<br>
+            <code style="color: var(--teal);">https://raotravels-backend.onrender.com</code></p>
         </div>
     `;
 };

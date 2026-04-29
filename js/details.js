@@ -117,11 +117,84 @@ const loadTourDetails = async () => {
 loadTourDetails();
 
 // ============================================================
-//  Booking Form Submission
+//  Booking Form Submission — with validation + spinner
 // ============================================================
 
 const BOOKING_API = CONFIG.API_BASE + '/api/bookings';
 
+// ---- Validation helpers ------------------------------------
+const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+const isValidPhone = (v) => /^[+]?[\d\s\-()]{7,15}$/.test(v);
+
+const setFieldError = (id, msg) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('input-error');
+    let hint = el.parentElement.querySelector('.field-hint');
+    if (!hint) {
+        hint = document.createElement('span');
+        hint.className = 'field-hint';
+        el.parentElement.appendChild(hint);
+    }
+    hint.textContent = msg;
+};
+
+const clearFieldError = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('input-error');
+    const hint = el.parentElement.querySelector('.field-hint');
+    if (hint) hint.textContent = '';
+};
+
+const clearAllErrors = () => {
+    ['b-name', 'b-email', 'b-phone', 'b-date'].forEach(clearFieldError);
+};
+
+const validateBookingForm = (data) => {
+    let valid = true;
+    clearAllErrors();
+
+    if (!data.name || data.name.length < 2) {
+        setFieldError('b-name', 'Please enter your full name (min 2 characters).');
+        valid = false;
+    }
+    if (!data.email || !isValidEmail(data.email)) {
+        setFieldError('b-email', 'Please enter a valid email address.');
+        valid = false;
+    }
+    if (!data.phone || !isValidPhone(data.phone)) {
+        setFieldError('b-phone', 'Please enter a valid phone number.');
+        valid = false;
+    }
+    if (!data.date) {
+        setFieldError('b-date', 'Please select a travel date.');
+        valid = false;
+    }
+    return valid;
+};
+
+// ---- Spinner overlay ---------------------------------------
+const showSpinner = () => {
+    let overlay = document.getElementById('booking-spinner');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'booking-spinner';
+        overlay.innerHTML = `
+            <div class="spinner-ring"></div>
+            <p>Confirming your booking…</p>
+        `;
+        document.querySelector('.booking-widget').appendChild(overlay);
+    }
+    overlay.style.display = 'flex';
+};
+
+const hideSpinner = () => {
+    const overlay = document.getElementById('booking-spinner');
+    if (overlay) overlay.style.display = 'none';
+};
+
+// ---- Form setup --------------------------------------------
 const setupBookingForm = () => {
     const form = document.getElementById('booking-form');
     if (!form) return;
@@ -133,12 +206,18 @@ const setupBookingForm = () => {
         dateInput.setAttribute('min', today);
     }
 
+    // Live clear errors on input
+    ['b-name', 'b-email', 'b-phone', 'b-date'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', () => clearFieldError(id));
+    });
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const tourId = getTourIdFromURL();
         const errorDiv = document.getElementById('booking-error');
-        const bookBtn = document.getElementById('book-btn');
+        const bookBtn  = document.getElementById('book-btn');
 
         if (!tourId) {
             errorDiv.textContent = 'Tour ID is missing. Please go back and try again.';
@@ -147,18 +226,27 @@ const setupBookingForm = () => {
         }
 
         const bookingData = {
-            name: document.getElementById('b-name').value.trim(),
-            email: document.getElementById('b-email').value.trim(),
-            phone: document.getElementById('b-phone').value.trim(),
-            tourId: tourId,
-            date: document.getElementById('b-date').value,
+            name:      document.getElementById('b-name').value.trim(),
+            email:     document.getElementById('b-email').value.trim(),
+            phone:     document.getElementById('b-phone').value.trim(),
+            tourId,
+            date:      document.getElementById('b-date').value,
             travelers: document.getElementById('b-travelers').value
         };
 
-        // Disable button and show loading
+        // Client-side validation
+        if (!validateBookingForm(bookingData)) {
+            // Scroll to first error
+            const firstErr = form.querySelector('.input-error');
+            if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        // Show spinner & disable button
         bookBtn.disabled = true;
-        bookBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        bookBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing…';
         errorDiv.style.display = 'none';
+        showSpinner();
 
         try {
             const response = await fetch(BOOKING_API, {
@@ -170,13 +258,14 @@ const setupBookingForm = () => {
             const json = await response.json();
 
             if (!response.ok || !json.success) {
-                throw new Error(json.message || 'Booking failed');
+                throw new Error(json.message || 'Booking failed. Please try again.');
             }
 
-            // Redirect to success page
+            // Success — redirect
             window.location.href = `booking-success.html?id=${json.bookingId}`;
 
         } catch (error) {
+            hideSpinner();
             errorDiv.textContent = error.message || 'Something went wrong. Please try again.';
             errorDiv.style.display = 'block';
             bookBtn.disabled = false;

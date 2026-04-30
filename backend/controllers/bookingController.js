@@ -22,14 +22,19 @@ const createBooking = async (req, res) => {
 
         const totalPrice = tour.price * Number(travelers);
 
-        const booking = await Booking.create({
-            name, email, phone, tourId, date,
+        const booking = new Booking({
+            name,
+            email,
+            phone,
+            tourId,
+            date,
             travelers: Number(travelers),
             totalPrice,
-            status: 'Pending',
-            vendorStatus: 'Pending',
+            status: 'pending',
+            vendorStatus: 'pending',
             assignedVendor: ''
         });
+        await booking.save();
 
         res.status(201).json({
             success: true,
@@ -87,14 +92,14 @@ const adminAction = async (req, res) => {
         }
 
         const update = {
-            status: action === 'approve' ? 'Approved' : 'Rejected',
-            adminNote: adminNote || '',
+            status: action === 'approve' ? 'approved' : 'rejected',
+            adminNotes: adminNote || '',
         };
 
         // Assign vendor only on approval
         if (action === 'approve' && assignedVendor) {
             update.assignedVendor = assignedVendor;
-            update.vendorStatus = 'Pending'; // reset vendor status on re-approval
+            update.vendorStatus = 'pending'; // reset vendor status on re-approval
         }
 
         const booking = await Booking.findByIdAndUpdate(req.params.id, update, { new: true })
@@ -131,16 +136,16 @@ const vendorAction = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Booking not found' });
         }
 
-        if (booking.status !== 'Approved') {
+        if (booking.status !== 'approved') {
             return res.status(400).json({
                 success: false,
                 message: 'Vendor can only act on Admin-Approved bookings.'
             });
         }
 
-        const vendorStatus = action === 'accept' ? 'Accepted' : 'Rejected';
+        const vendorStatus = action === 'accept' ? 'accepted' : 'rejected';
         // If vendor accepts → Confirmed, if rejects → stays Approved (admin can reassign)
-        const newStatus = action === 'accept' ? 'Confirmed' : 'Approved';
+        const newStatus = action === 'accept' ? 'confirmed' : 'approved';
 
         const updated = await Booking.findByIdAndUpdate(
             req.params.id,
@@ -165,7 +170,7 @@ const vendorAction = async (req, res) => {
 const updateBookingStatus = async (req, res) => {
     try {
         const { status } = req.body;
-        if (!['Pending', 'Approved', 'Rejected', 'Confirmed', 'Cancelled'].includes(status)) {
+        if (!['pending', 'approved', 'rejected', 'confirmed', 'cancelled'].includes(status)) {
             return res.status(400).json({ success: false, message: 'Invalid status value' });
         }
         const booking = await Booking.findByIdAndUpdate(

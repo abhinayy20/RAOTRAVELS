@@ -20,24 +20,26 @@ const showToast = (msg, type = 'success') => {
 //  Status badge helper
 // ============================================================
 const statusBadge = (status) => {
+    const sStr = (status || 'pending').toLowerCase();
     const map = {
-        Pending:   { cls: 'badge-pending',   icon: 'fa-clock' },
-        Approved:  { cls: 'badge-approved',  icon: 'fa-thumbs-up' },
-        Rejected:  { cls: 'badge-rejected',  icon: 'fa-times-circle' },
-        Confirmed: { cls: 'badge-confirmed', icon: 'fa-check-circle' },
-        Cancelled: { cls: 'badge-rejected',  icon: 'fa-ban' },
+        pending:   { cls: 'badge-pending',   icon: 'fa-clock' },
+        approved:  { cls: 'badge-approved',  icon: 'fa-thumbs-up' },
+        rejected:  { cls: 'badge-rejected',  icon: 'fa-times-circle' },
+        confirmed: { cls: 'badge-confirmed', icon: 'fa-check-circle' },
+        cancelled: { cls: 'badge-rejected',  icon: 'fa-ban' },
     };
-    const s = map[status] || map.Pending;
+    const s = map[sStr] || map.pending;
     return `<span class="status-badge ${s.cls}"><i class="fas ${s.icon}"></i> ${status}</span>`;
 };
 
 const vendorBadge = (status) => {
+    const sStr = (status || 'pending').toLowerCase();
     const map = {
-        Pending:  { cls: 'badge-pending',   icon: 'fa-clock' },
-        Accepted: { cls: 'badge-confirmed', icon: 'fa-check' },
-        Rejected: { cls: 'badge-rejected',  icon: 'fa-times' },
+        pending:  { cls: 'badge-pending',   icon: 'fa-clock' },
+        accepted: { cls: 'badge-confirmed', icon: 'fa-check' },
+        rejected: { cls: 'badge-rejected',  icon: 'fa-times' },
     };
-    const s = map[status] || map.Pending;
+    const s = map[sStr] || map.pending;
     return `<span class="status-badge ${s.cls}"><i class="fas ${s.icon}"></i> ${status}</span>`;
 };
 
@@ -90,16 +92,16 @@ const loadDashboard = async () => {
         document.getElementById('stat-tours').textContent    = tours.length;
         document.getElementById('stat-bookings').textContent = bookings.length;
 
-        const pending  = bookings.filter(b => b.status === 'Pending').length;
-        const approved = bookings.filter(b => b.status === 'Approved').length;
-        const confirmed = bookings.filter(b => b.status === 'Confirmed').length;
+        const pending  = bookings.filter(b => b.status === 'pending').length;
+        const approved = bookings.filter(b => b.status === 'approved').length;
+        const confirmed = bookings.filter(b => b.status === 'confirmed').length;
 
         document.getElementById('stat-pending').textContent   = pending;
         document.getElementById('stat-approved').textContent  = approved;
         document.getElementById('stat-confirmed').textContent = confirmed;
 
         const revenue = bookings
-            .filter(b => b.status === 'Confirmed')
+            .filter(b => b.status === 'confirmed')
             .reduce((sum, b) => sum + (b.totalPrice || 0), 0);
         document.getElementById('stat-revenue').textContent = formatPrice(revenue);
 
@@ -126,7 +128,7 @@ const loadDashboard = async () => {
                             <td>${formatDate(b.date)}</td>
                             <td>${formatPrice(b.totalPrice || 0)}</td>
                             <td>${statusBadge(b.status)}</td>
-                            <td>${vendorBadge(b.vendorStatus || 'Pending')}</td>
+                            <td>${vendorBadge(b.vendorStatus)}</td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -284,26 +286,26 @@ const loadBookings = async () => {
                 <td>${b.travelers}</td>
                 <td>${formatPrice(b.totalPrice || 0)}</td>
                 <td>${statusBadge(b.status)}</td>
-                <td>${vendorBadge(b.vendorStatus || 'Pending')}</td>
+                <td>${vendorBadge(b.vendorStatus)}</td>
                 <td><span class="vendor-label">${b.assignedVendor || '—'}</span></td>
                 <td>
                     <div class="action-btns">
-                        ${b.status === 'Pending' ? `
+                        ${b.status === 'pending' ? `
                             <button class="btn btn-sm btn-approve" onclick="adminBookingAction('${b._id}', 'approve')">
                                 <i class="fas fa-check"></i> Approve
                             </button>
                             <button class="btn btn-sm btn-delete" onclick="adminBookingAction('${b._id}', 'reject')">
                                 <i class="fas fa-times"></i> Reject
                             </button>
-                        ` : b.status === 'Approved' ? `
+                        ` : b.status === 'approved' ? `
                             <span style="color:var(--teal);font-size:0.82rem;"><i class="fas fa-hourglass-half"></i> Awaiting Vendor</span>
                             <button class="btn btn-sm btn-delete" onclick="adminBookingAction('${b._id}', 'reject')" style="margin-top:4px;">
                                 <i class="fas fa-times"></i> Reject
                             </button>
-                        ` : b.status === 'Confirmed' ? `
+                        ` : b.status === 'confirmed' ? `
                             <span style="color:#00d4b4;font-size:0.82rem;"><i class="fas fa-check-double"></i> Confirmed</span>
                         ` : `
-                            <span style="color:#ff4d4d;font-size:0.82rem;"><i class="fas fa-times-circle"></i> ${b.status}</span>
+                            <span style="color:#ff4d4d;font-size:0.82rem;text-transform:capitalize;"><i class="fas fa-times-circle"></i> ${b.status}</span>
                         `}
                     </div>
                 </td>
@@ -321,15 +323,14 @@ window.adminBookingAction = async (id, action) => {
 
     if (action === 'approve') {
         assignedVendor = prompt('Assign vendor name (optional):', 'RAO Travels Local Team') || '';
-    }
 
     if (!confirm(`${label} this booking?`)) return;
 
     try {
-        const res = await fetch(`${API}/bookings/${id}/admin-action`, {
+        const endpoint = action === 'approve' ? `/admin/bookings/${id}/approve` : `/admin/bookings/${id}/reject`;
+        const res = await fetch(`${API}${endpoint}`, {
             method:  'PUT',
-            headers: authHeader(),
-            body:    JSON.stringify({ action, assignedVendor })
+            headers: authHeader()
         });
         const json = await res.json();
         if (!res.ok || !json.success) throw new Error(json.message || 'Action failed');

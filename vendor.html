@@ -3,178 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vendor Portal | RAO TRAVELS</title>
-    <meta name="robots" content="noindex, nofollow">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Vendor Panel | RAO TRAVELS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/admin.css">
     <style>
-        /* Vendor-specific overrides */
-        .vendor-header-bar {
-            background: linear-gradient(135deg, #0d1b2a 0%, #1a2744 100%);
-            border-bottom: 2px solid #667eea;
-            padding: 18px 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .vendor-brand { font-size: 1.3rem; font-weight: 700; color: #e6e8ec; }
-        .vendor-brand span { color: #667eea; }
-        .vendor-badge-label {
-            background: rgba(102,126,234,0.15);
-            color: #667eea;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-        .vendor-main { padding: 30px; max-width: 1300px; margin: 0 auto; }
-        .filter-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-        .filter-chip {
-            padding: 7px 18px;
-            border-radius: 25px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: transparent;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .filter-chip.active, .filter-chip:hover {
-            background: rgba(102,126,234,0.15);
-            color: #667eea;
-            border-color: #667eea;
-        }
-        .booking-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; }
-        .booking-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 22px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .booking-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .booking-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-        }
-        .booking-card h3 { font-size: 1rem; margin-bottom: 4px; color: #e6e8ec; }
-        .booking-card-meta { font-size: 0.8rem; color: var(--text-muted); }
-        .booking-card-details { margin-bottom: 18px; }
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 7px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.83rem;
-        }
-        .detail-row:last-child { border-bottom: none; }
-        .detail-label { color: var(--text-muted); }
-        .detail-value { color: #e6e8ec; font-weight: 500; }
-        .detail-value.gold { color: #f5c842; font-weight: 700; }
-        .card-actions { display: flex; gap: 10px; }
-        .card-actions button { flex: 1; padding: 10px; border-radius: 8px; border: none; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; }
-        .btn-accept { background: rgba(0,212,180,0.15); color: #00d4b4; }
-        .btn-accept:hover { background: rgba(0,212,180,0.3); }
-        .btn-vendor-reject { background: rgba(255,77,77,0.12); color: #ff4d4d; }
-        .btn-vendor-reject:hover { background: rgba(255,77,77,0.25); }
-        .empty-state { text-align: center; padding: 80px 20px; color: var(--text-muted); }
-        .empty-state i { font-size: 3rem; color: #667eea; display: block; margin-bottom: 16px; }
-        .loading-state { text-align: center; padding: 60px; color: var(--text-muted); }
-        .loading-state i { font-size: 2rem; color: #667eea; margin-bottom: 12px; display: block; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .page-title-bar { margin-bottom: 24px; }
-        .page-title-bar h2 { font-size: 1.4rem; color: var(--text-primary); margin-bottom: 4px; }
-        .page-title-bar p { color: var(--text-muted); font-size: 0.85rem; }
-        .stats-mini { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-        .stat-mini-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 14px 22px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 1;
-            min-width: 130px;
-        }
-        .stat-mini-card i { font-size: 1.2rem; }
-        .stat-mini-num { font-size: 1.4rem; font-weight: 700; }
-        .stat-mini-lbl { font-size: 0.75rem; color: var(--text-muted); }
+        body { padding: 40px; background-color: var(--bg-dark); color: #fff; font-family: 'Inter', sans-serif; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        h1 { color: var(--gold); }
+        .card { background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        th { color: var(--text-muted); font-weight: 500; }
+        .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: 600; font-size: 0.9rem; }
+        .btn-accept { background-color: #00d4b4; }
+        .btn-reject { background-color: #ff4d4d; }
     </style>
 </head>
 <body>
-
-    <!-- Header -->
-    <header class="vendor-header-bar">
-        <div class="vendor-brand"><span>RAO</span>TRAVELS <small style="font-weight:300;color:var(--text-muted);font-size:0.85rem;"> / Vendor Portal</small></div>
-        <div style="display:flex;align-items:center;gap:15px;">
-            <span class="vendor-badge-label"><i class="fas fa-store"></i> Vendor View</span>
-            <a href="index.html" style="color:var(--text-muted);font-size:0.85rem;text-decoration:none;"><i class="fas fa-globe"></i> Website</a>
+    <div class="container">
+        <div class="header">
+            <h1>Vendor Booking Panel</h1>
+            <a href="index.html" style="color:var(--text-muted);">Back to Home</a>
         </div>
-    </header>
-
-    <!-- Main -->
-    <div class="vendor-main">
-
-        <!-- Page Title -->
-        <div class="page-title-bar">
-            <h2><i class="fas fa-handshake" style="color:#667eea;margin-right:10px;"></i>Assigned Bookings</h2>
-            <p>Review and respond to bookings assigned to you by the admin.</p>
+        
+        <div class="card">
+            <h3>Assigned Bookings</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Customer</th>
+                        <th>Tour ID</th>
+                        <th>Date</th>
+                        <th>Admin Status</th>
+                        <th>Vendor Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="vendor-bookings">
+                    <tr><td colspan="7" style="text-align:center;">Loading...</td></tr>
+                </tbody>
+            </table>
         </div>
-
-        <!-- Mini Stats -->
-        <div class="stats-mini">
-            <div class="stat-mini-card">
-                <i class="fas fa-inbox" style="color:#667eea;"></i>
-                <div><div class="stat-mini-num" id="v-total">0</div><div class="stat-mini-lbl">Total Assigned</div></div>
-            </div>
-            <div class="stat-mini-card">
-                <i class="fas fa-clock" style="color:#fbbf24;"></i>
-                <div><div class="stat-mini-num" id="v-pending">0</div><div class="stat-mini-lbl">Awaiting Action</div></div>
-            </div>
-            <div class="stat-mini-card">
-                <i class="fas fa-check" style="color:#00d4b4;"></i>
-                <div><div class="stat-mini-num" id="v-accepted">0</div><div class="stat-mini-lbl">Accepted</div></div>
-            </div>
-            <div class="stat-mini-card">
-                <i class="fas fa-times" style="color:#ff4d4d;"></i>
-                <div><div class="stat-mini-num" id="v-rejected">0</div><div class="stat-mini-lbl">Rejected</div></div>
-            </div>
-        </div>
-
-        <!-- Filter Chips -->
-        <div class="filter-row">
-            <button class="filter-chip active" data-filter="all">All Bookings</button>
-            <button class="filter-chip" data-filter="Pending">Pending Action</button>
-            <button class="filter-chip" data-filter="Accepted">Accepted</button>
-            <button class="filter-chip" data-filter="Rejected">Rejected</button>
-        </div>
-
-        <!-- Booking Cards Grid -->
-        <div class="booking-cards" id="vendor-cards">
-            <div class="loading-state" style="grid-column:1/-1;">
-                <i class="fas fa-circle-notch"></i>
-                Loading assigned bookings…
-            </div>
-        </div>
-
     </div>
 
-    <!-- Toast -->
-    <div class="toast" id="toast"></div>
-
     <script src="js/config.js"></script>
-    <script src="js/vendor.js"></script>
+    <script>
+        const API = CONFIG.API_BASE + '/api';
+
+        const loadBookings = async () => {
+            try {
+                // Fetching all bookings for simulation, usually a vendor would only see theirs
+                const res = await fetch(`${API}/vendor/bookings`);
+                const json = await res.json();
+                const bookings = json.data || [];
+                const tbody = document.getElementById('vendor-bookings');
+
+                if (bookings.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No bookings found.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = bookings.map(b => `
+                    <tr>
+                        <td style="font-size:0.8rem;">${b._id}</td>
+                        <td>${b.name}</td>
+                        <td style="font-size:0.8rem;">${b.tourId ? b.tourId._id : 'N/A'}</td>
+                        <td>${new Date(b.date).toLocaleDateString()}</td>
+                        <td style="color:${b.status==='approved'?'#00d4b4':b.status==='rejected'?'#ff4d4d':b.status==='confirmed'?'#00d4b4':'var(--gold)'}">${b.status}</td>
+                        <td style="color:${b.vendorStatus==='accepted'?'#00d4b4':b.vendorStatus==='rejected'?'#ff4d4d':'var(--gold)'}">${b.vendorStatus || 'pending'}</td>
+                        <td>
+                            ${b.status === 'approved' && (!b.vendorStatus || b.vendorStatus === 'pending') ? `
+                                <button class="btn btn-accept" onclick="vendorAction('${b._id}', 'accept')">Accept</button>
+                                <button class="btn btn-reject" onclick="vendorAction('${b._id}', 'reject')">Reject</button>
+                            ` : '—'}
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error(err);
+                document.getElementById('vendor-bookings').innerHTML = '<tr><td colspan="7" style="text-align:center;color:red;">Error loading bookings.</td></tr>';
+            }
+        };
+
+        window.vendorAction = async (id, action) => {
+            if (!confirm(`Are you sure you want to ${action} this booking?`)) return;
+            try {
+                const res = await fetch(`${API}/vendor/bookings/${id}/${action}`, {
+                    method: 'PUT'
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.message);
+                alert(`Booking ${action}ed!`);
+                loadBookings();
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+        };
+
+        loadBookings();
+    </script>
 </body>
 </html>

@@ -24,12 +24,14 @@ const tourRoutes    = require('./routes/tourRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const adminRoutes   = require('./routes/adminRoutes');
 const aiRoutes      = require('./routes/aiRoutes');
+const vendorRoutes  = require('./routes/vendorRoutes');
 
 // Mount routers
 app.use('/api/tours',    tourRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/admin',    adminRoutes);
 app.use('/api/ai',       aiRoutes);
+app.use('/api/vendor',   vendorRoutes);
 
 // Root route
 app.get('/', (req, res) => {

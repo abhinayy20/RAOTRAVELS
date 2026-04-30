@@ -35,13 +35,13 @@ const bookingSchema = new mongoose.Schema({
     // ---- Workflow Status Fields ----
     status: {
         type: String,
-        enum: ['Pending', 'Approved', 'Rejected', 'Confirmed', 'Cancelled'],
-        default: 'Pending'
+        enum: ['pending', 'approved', 'rejected', 'confirmed'],
+        default: 'pending'
     },
     vendorStatus: {
         type: String,
-        enum: ['Pending', 'Accepted', 'Rejected'],
-        default: 'Pending'
+        enum: ['pending', 'accepted', 'rejected'],
+        default: 'pending'
     },
     assignedVendor: {
         type: String,
@@ -49,7 +49,7 @@ const bookingSchema = new mongoose.Schema({
     },
 
     // Admin who acted on the booking
-    adminNote: {
+    adminNotes: {
         type: String,
         default: ''
     }

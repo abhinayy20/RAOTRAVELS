@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
+const Booking = require('../models/Booking');
 
 // @desc    Admin login
 // @route   POST /api/admin/login
@@ -55,4 +56,42 @@ const verifyToken = async (req, res) => {
     res.status(200).json({ success: true, admin: { id: req.admin.id, email: req.admin.email } });
 };
 
-module.exports = { adminLogin, verifyToken };
+// @desc    Approve booking
+// @route   PUT /api/admin/bookings/:id/approve
+// @access  Private
+const approveBooking = async (req, res) => {
+    try {
+        const booking = await Booking.findByIdAndUpdate(
+            req.params.id,
+            { status: 'approved' },
+            { new: true, runValidators: true }
+        );
+        if (!booking) {
+            return res.status(404).json({ success: false, message: 'Booking not found' });
+        }
+        res.status(200).json({ success: true, booking });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
+// @desc    Reject booking
+// @route   PUT /api/admin/bookings/:id/reject
+// @access  Private
+const rejectBooking = async (req, res) => {
+    try {
+        const booking = await Booking.findByIdAndUpdate(
+            req.params.id,
+            { status: 'rejected' },
+            { new: true, runValidators: true }
+        );
+        if (!booking) {
+            return res.status(404).json({ success: false, message: 'Booking not found' });
+        }
+        res.status(200).json({ success: true, booking });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
+module.exports = { adminLogin, verifyToken, approveBooking, rejectBooking };

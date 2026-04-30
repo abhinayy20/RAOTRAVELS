@@ -323,6 +323,7 @@ window.adminBookingAction = async (id, action) => {
 
     if (action === 'approve') {
         assignedVendor = prompt('Assign vendor name (optional):', 'RAO Travels Local Team') || '';
+    }
 
     if (!confirm(`${label} this booking?`)) return;
 

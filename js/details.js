@@ -217,7 +217,7 @@ const setupBookingForm = () => {
 
         const tourId = getTourIdFromURL();
         const errorDiv = document.getElementById('booking-error');
-        const bookBtn  = document.getElementById('book-btn');
+        const bookBtn = document.getElementById('book-btn');
 
         if (!tourId) {
             errorDiv.textContent = 'Tour ID is missing. Please go back and try again.';
@@ -226,12 +226,12 @@ const setupBookingForm = () => {
         }
 
         const bookingData = {
-            name:      document.getElementById('b-name').value.trim(),
-            email:     document.getElementById('b-email').value.trim(),
-            phone:     document.getElementById('b-phone').value.trim(),
+            name: document.getElementById('b-name').value.trim(),
+            email: document.getElementById('b-email').value.trim(),
+            phone: document.getElementById('b-phone').value.trim(),
             tourId,
-            date:      document.getElementById('b-date').value,
-            travelers: document.getElementById('b-travelers').value
+            date: document.getElementById('b-date').value,
+            travelers: Number(document.getElementById('b-travelers').value)
         };
 
         // Client-side validation

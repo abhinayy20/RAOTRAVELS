@@ -1,196 +1,215 @@
 // ============================================================
-//  vendor.js — RAO Travels Vendor Portal
-//  Shows bookings where status === 'Approved' (admin-approved)
-//  and allows vendor to Accept or Reject each booking
+//  vendor.js — Logic for Vendor Dashboard
 // ============================================================
 
-const API = CONFIG.API_BASE + '/api';
-const formatPrice = (p) => '₹' + Number(p).toLocaleString('en-IN');
-const formatDate  = (d) => new Date(d).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
-
-// ---- Toast ----
-const showToast = (msg, type = 'success') => {
-    const toast = document.getElementById('toast');
-    toast.className = `toast ${type} show`;
-    toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
-    setTimeout(() => toast.classList.remove('show'), 3500);
-};
-
-// ---- State ----
-let allBookings  = [];
-let activeFilter = 'all';
-
-// ---- Vendor status badge ----
-const vBadge = (status) => {
-    const map = {
-        Pending:  { cls: 'badge-pending',   icon: 'fa-clock',        label: 'Awaiting Your Action' },
-        Accepted: { cls: 'badge-confirmed', icon: 'fa-check-circle', label: 'Accepted' },
-        Rejected: { cls: 'badge-rejected',  icon: 'fa-times-circle', label: 'Rejected' },
-    };
-    const s = map[status] || map.Pending;
-    return `<span class="status-badge ${s.cls}"><i class="fas ${s.icon}"></i> ${s.label}</span>`;
-};
-
-// ---- Render cards ----
-const renderCards = () => {
-    const grid = document.getElementById('vendor-cards');
-
-    let filtered = allBookings;
-    if (activeFilter !== 'all') {
-        filtered = allBookings.filter(b => b.vendorStatus === activeFilter);
-    }
-
-    if (filtered.length === 0) {
-        grid.innerHTML = `
-            <div class="empty-state" style="grid-column:1/-1;">
-                <i class="fas fa-inbox"></i>
-                <h3 style="color:#e6e8ec;margin-bottom:8px;">No bookings here</h3>
-                <p>${activeFilter === 'all' ? 'No bookings have been assigned to you yet.' : `No bookings with status "${activeFilter}".`}</p>
-            </div>`;
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Authentication Check
+    const token = localStorage.getItem('vendorToken');
+    if (!token) {
+        window.location.href = 'vendor-login.html';
         return;
     }
 
-    grid.innerHTML = filtered.map(b => {
-        const tourName = b.tourId ? b.tourId.title : 'Unknown Tour';
-        const location = b.tourId ? b.tourId.location : '—';
-        const canAct   = b.vendorStatus === 'Pending';
+    // 2. DOM Elements
+    const logoutBtn = document.getElementById('logout-btn');
+    const loadingState = document.getElementById('loading-state');
+    const emptyState = document.getElementById('empty-state');
+    const bookingsGrid = document.getElementById('bookings-grid');
+    const bookingStats = document.getElementById('booking-stats');
+    const toastContainer = document.getElementById('toast-container');
 
-        return `
-        <div class="booking-card" id="vcard-${b._id}">
-            <div class="booking-card-header">
-                <div>
-                    <h3>${b.name}</h3>
-                    <div class="booking-card-meta">${b.email} · ${b.phone}</div>
-                </div>
-                ${vBadge(b.vendorStatus || 'Pending')}
-            </div>
-            <div class="booking-card-details">
-                <div class="detail-row">
-                    <span class="detail-label"><i class="fas fa-map-marker-alt"></i> Tour</span>
-                    <span class="detail-value">${tourName}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label"><i class="fas fa-location-dot"></i> Location</span>
-                    <span class="detail-value">${location}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label"><i class="fas fa-calendar"></i> Travel Date</span>
-                    <span class="detail-value">${formatDate(b.date)}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label"><i class="fas fa-users"></i> Travelers</span>
-                    <span class="detail-value">${b.travelers} Person(s)</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label"><i class="fas fa-rupee-sign"></i> Total Amount</span>
-                    <span class="detail-value gold">${formatPrice(b.totalPrice || 0)}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label"><i class="fas fa-tag"></i> Assigned Vendor</span>
-                    <span class="detail-value">${b.assignedVendor || '—'}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label"><i class="fas fa-hashtag"></i> Booking ID</span>
-                    <span class="detail-value" style="font-size:0.75rem;color:var(--text-muted);">${b._id}</span>
-                </div>
-            </div>
-            ${canAct ? `
-            <div class="card-actions">
-                <button class="btn-accept" onclick="vendorAct('${b._id}', 'accept')">
-                    <i class="fas fa-check"></i> Accept
-                </button>
-                <button class="btn-vendor-reject" onclick="vendorAct('${b._id}', 'reject')">
-                    <i class="fas fa-times"></i> Reject
-                </button>
-            </div>` : `
-            <div style="text-align:center;padding:10px 0;font-size:0.8rem;color:var(--text-muted);">
-                <i class="fas fa-lock"></i> Action already taken
-            </div>`}
-        </div>`;
-    }).join('');
-};
-
-// ---- Update mini-stats ----
-const updateStats = () => {
-    document.getElementById('v-total').textContent    = allBookings.length;
-    document.getElementById('v-pending').textContent  = allBookings.filter(b => b.vendorStatus === 'Pending').length;
-    document.getElementById('v-accepted').textContent = allBookings.filter(b => b.vendorStatus === 'Accepted').length;
-    document.getElementById('v-rejected').textContent = allBookings.filter(b => b.vendorStatus === 'Rejected').length;
-};
-
-// ---- Load bookings assigned to vendors (status === Approved) ----
-const loadVendorBookings = async () => {
-    const grid = document.getElementById('vendor-cards');
-    grid.innerHTML = `<div class="loading-state" style="grid-column:1/-1;"><i class="fas fa-circle-notch"></i>Loading…</div>`;
-
-    try {
-        // Fetch all bookings — vendor sees only those that are Admin-Approved
-        // In production you'd pass a vendor token here
-        const res  = await fetch(`${API}/bookings`);
-        const json = await res.json();
-
-        if (!res.ok || !json.success) throw new Error(json.message || 'Failed to load');
-
-        // Filter: only bookings that admin has approved (status = Approved OR Confirmed)
-        allBookings = (json.data || []).filter(b =>
-            b.status === 'Approved' || b.status === 'Confirmed'
-        );
-
-        updateStats();
-        renderCards();
-    } catch (err) {
-        grid.innerHTML = `
-            <div class="empty-state" style="grid-column:1/-1;">
-                <i class="fas fa-exclamation-circle" style="color:#ff4d4d;"></i>
-                <h3 style="color:#e6e8ec;">Could not load bookings</h3>
-                <p>${err.message}</p>
-                <button onclick="loadVendorBookings()" style="margin-top:15px;padding:10px 24px;background:#667eea;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
-                    <i class="fas fa-redo"></i> Retry
-                </button>
-            </div>`;
-        console.error('Vendor load error:', err);
-    }
-};
-
-// ---- Vendor Accept / Reject ----
-window.vendorAct = async (id, action) => {
-    const label = action === 'accept' ? 'Accept' : 'Reject';
-    if (!confirm(`${label} this booking? This cannot be undone.`)) return;
-
-    try {
-        const res = await fetch(`${API}/bookings/${id}/vendor-action`, {
-            method:  'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ action })
-        });
-        const json = await res.json();
-        if (!res.ok || !json.success) throw new Error(json.message || 'Action failed');
-
-        showToast(`Booking ${action === 'accept' ? 'Accepted ✓' : 'Rejected'} successfully!`);
-
-        // Update local state and re-render without full reload
-        const idx = allBookings.findIndex(b => b._id === id);
-        if (idx !== -1) {
-            allBookings[idx].vendorStatus = action === 'accept' ? 'Accepted' : 'Rejected';
-            allBookings[idx].status = action === 'accept' ? 'Confirmed' : 'Approved';
-        }
-        updateStats();
-        renderCards();
-
-    } catch (err) {
-        showToast(err.message, 'error');
-    }
-};
-
-// ---- Filter chips ----
-document.querySelectorAll('.filter-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        activeFilter = chip.getAttribute('data-filter');
-        renderCards();
+    // 3. Logout
+    logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('vendorToken');
+        window.location.href = 'vendor-login.html';
     });
-});
 
-// ---- Init ----
-loadVendorBookings();
+    // 4. Toast Notification System
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        let icon = 'fa-check-circle';
+        if (type === 'error') icon = 'fa-exclamation-circle';
+        if (type === 'info') icon = 'fa-info-circle';
+
+        toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
+        toastContainer.appendChild(toast);
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // 5. Fetch Bookings
+    async function fetchAssignedBookings() {
+        try {
+            const res = await fetch(`${CONFIG.API_BASE}/api/bookings`);
+            const data = await res.json();
+            
+            if (res.ok) {
+                // Filter: only show bookings where Admin approved them
+                // and maybe vendorStatus exists (assuming 'pending' is default)
+                const assignedBookings = data.filter(b => b.status === 'approved');
+                renderBookings(assignedBookings);
+            } else {
+                showToast('Failed to fetch bookings', 'error');
+                showEmptyState();
+            }
+        } catch (error) {
+            console.error('Error fetching bookings:', error);
+            showToast('Server connection error', 'error');
+            showEmptyState();
+        }
+    }
+
+    // 6. UI State Managers
+    function showLoadingState() {
+        loadingState.style.display = 'flex';
+        bookingsGrid.style.display = 'none';
+        emptyState.style.display = 'none';
+    }
+
+    function showEmptyState() {
+        loadingState.style.display = 'none';
+        bookingsGrid.style.display = 'none';
+        emptyState.style.display = 'flex';
+        bookingStats.textContent = `0 Active Assignments`;
+    }
+
+    // 7. Render Bookings
+    function renderBookings(bookings) {
+        if (!bookings || bookings.length === 0) {
+            showEmptyState();
+            return;
+        }
+
+        loadingState.style.display = 'none';
+        emptyState.style.display = 'none';
+        bookingsGrid.style.display = 'grid';
+        bookingsGrid.innerHTML = '';
+        
+        // Stats
+        const pendingCount = bookings.filter(b => b.vendorStatus === 'pending' || !b.vendorStatus).length;
+        bookingStats.textContent = `${pendingCount} Pending Actions | ${bookings.length} Total Assignments`;
+
+        bookings.forEach(booking => {
+            // Safe fallback for potentially missing fields
+            const vendorStatus = booking.vendorStatus || 'pending';
+            const price = booking.totalPrice ? `$${booking.totalPrice}` : 'N/A';
+            const date = new Date(booking.bookingDate || booking.createdAt).toLocaleDateString();
+
+            const card = document.createElement('div');
+            card.className = 'booking-card';
+            card.dataset.id = booking._id;
+
+            // Build Action Buttons or Status Indicator
+            let actionsHTML = '';
+            if (vendorStatus === 'pending') {
+                actionsHTML = `
+                    <div class="card-actions" id="actions-${booking._id}">
+                        <button class="btn-action btn-accept" onclick="handleVendorAction('${booking._id}', 'confirmed')">
+                            <i class="fas fa-check"></i> Accept
+                        </button>
+                        <button class="btn-action btn-reject" onclick="handleVendorAction('${booking._id}', 'rejected')">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    </div>
+                `;
+            } else if (vendorStatus === 'confirmed') {
+                actionsHTML = `<div class="vendor-status-indicator indicator-confirmed"><i class="fas fa-check-circle"></i> Accepted</div>`;
+            } else if (vendorStatus === 'rejected') {
+                actionsHTML = `<div class="vendor-status-indicator indicator-rejected"><i class="fas fa-times-circle"></i> Rejected</div>`;
+            }
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="tour-info">
+                        <h3>${booking.tourName || 'Custom Tour'}</h3>
+                        <div class="date"><i class="far fa-calendar-alt"></i> ${date}</div>
+                    </div>
+                    <span class="status-badge status-approved">
+                        <i class="fas fa-shield-alt"></i> Admin Approved
+                    </span>
+                </div>
+                
+                <div class="card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-user"></i> Customer</span>
+                        <span class="detail-value">${booking.customerName}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-users"></i> Travelers</span>
+                        <span class="detail-value">${booking.travelers} Persons</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-phone"></i> Contact</span>
+                        <span class="detail-value">${booking.phone || 'N/A'}</span>
+                    </div>
+                    <div class="detail-row" style="margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--border);">
+                        <span class="detail-label">Total Value</span>
+                        <span class="price-value">${price}</span>
+                    </div>
+                </div>
+
+                ${actionsHTML}
+            `;
+
+            bookingsGrid.appendChild(card);
+        });
+    }
+
+    // 8. Handle Accept/Reject Actions
+    window.handleVendorAction = async function(bookingId, status) {
+        const actionDiv = document.getElementById(`actions-${bookingId}`);
+        const buttons = actionDiv.querySelectorAll('button');
+        
+        // Disable buttons & show loading state
+        buttons.forEach(btn => {
+            btn.disabled = true;
+            if (btn.classList.contains(`btn-${status === 'confirmed' ? 'accept' : 'reject'}`)) {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            }
+        });
+
+        try {
+            const res = await fetch(`${CONFIG.API_BASE}/api/bookings/${bookingId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ vendorStatus: status })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                showToast(`Booking successfully ${status}!`, 'success');
+                // Replace action buttons with status indicator
+                const indicatorClass = status === 'confirmed' ? 'indicator-confirmed' : 'indicator-rejected';
+                const indicatorIcon = status === 'confirmed' ? 'fa-check-circle' : 'fa-times-circle';
+                const indicatorText = status === 'confirmed' ? 'Accepted' : 'Rejected';
+                
+                actionDiv.outerHTML = `<div class="vendor-status-indicator ${indicatorClass}">
+                    <i class="fas ${indicatorIcon}"></i> ${indicatorText}
+                </div>`;
+                
+                // Optional: refresh data to update counts
+                // fetchAssignedBookings();
+            } else {
+                showToast(data.message || 'Failed to update booking', 'error');
+                // Re-enable buttons
+                buttons.forEach(btn => btn.disabled = false);
+            }
+        } catch (error) {
+            console.error('Error updating status:', error);
+            showToast('Network error while updating status', 'error');
+            // Re-enable buttons
+            buttons.forEach(btn => btn.disabled = false);
+        }
+    };
+
+    // Initial Load
+    showLoadingState();
+    fetchAssignedBookings();
+});

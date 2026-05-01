@@ -3,107 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vendor Panel | RAO TRAVELS</title>
+    <title>Vendor Dashboard | RAO TRAVELS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/admin.css">
-    <style>
-        body { padding: 40px; background-color: var(--bg-dark); color: #fff; font-family: 'Inter', sans-serif; }
-        .container { max-width: 1000px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        h1 { color: var(--gold); }
-        .card { background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        th { color: var(--text-muted); font-weight: 500; }
-        .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: 600; font-size: 0.9rem; }
-        .btn-accept { background-color: #00d4b4; }
-        .btn-reject { background-color: #ff4d4d; }
-    </style>
+    <link rel="stylesheet" href="css/vendor.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Vendor Booking Panel</h1>
-            <a href="index.html" style="color:var(--text-muted);">Back to Home</a>
-        </div>
-        
-        <div class="card">
-            <h3>Assigned Bookings</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Booking ID</th>
-                        <th>Customer</th>
-                        <th>Tour ID</th>
-                        <th>Date</th>
-                        <th>Admin Status</th>
-                        <th>Vendor Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="vendor-bookings">
-                    <tr><td colspan="7" style="text-align:center;">Loading...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
 
+    <!-- Header -->
+    <header class="vendor-header">
+        <div class="brand-wrapper">
+            <h1><span class="gold">RAO</span>TRAVELS</h1>
+            <span class="vendor-badge"><i class="fas fa-handshake"></i> Vendor Portal</span>
+        </div>
+        <div class="header-right">
+            <button id="logout-btn" class="btn-logout">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="page-title">
+            <h2>Assigned Bookings</h2>
+            <span id="booking-stats">Loading...</span>
+        </div>
+
+        <div id="vendor-content">
+            <!-- Loading State -->
+            <div class="loading-state" id="loading-state">
+                <i class="fas fa-circle-notch fa-spin"></i>
+                <p>Loading your assignments...</p>
+            </div>
+            
+            <!-- Bookings Grid -->
+            <div class="bookings-grid" id="bookings-grid" style="display: none;">
+                <!-- Cards will be injected here via JS -->
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="empty-state" style="display: none;">
+                <i class="fas fa-box-open"></i>
+                <h3>No pending assignments</h3>
+                <p>You currently don't have any new bookings to process.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toasts -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Scripts -->
     <script src="js/config.js"></script>
-    <script>
-        const API = CONFIG.API_BASE + '/api';
-
-        const loadBookings = async () => {
-            try {
-                // Fetching all bookings for simulation, usually a vendor would only see theirs
-                const res = await fetch(`${API}/vendor/bookings`);
-                const json = await res.json();
-                const bookings = json.data || [];
-                const tbody = document.getElementById('vendor-bookings');
-
-                if (bookings.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No bookings found.</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = bookings.map(b => `
-                    <tr>
-                        <td style="font-size:0.8rem;">${b._id}</td>
-                        <td>${b.name}</td>
-                        <td style="font-size:0.8rem;">${b.tourId ? b.tourId._id : 'N/A'}</td>
-                        <td>${new Date(b.date).toLocaleDateString()}</td>
-                        <td style="color:${b.status==='approved'?'#00d4b4':b.status==='rejected'?'#ff4d4d':b.status==='confirmed'?'#00d4b4':'var(--gold)'}">${b.status}</td>
-                        <td style="color:${b.vendorStatus==='accepted'?'#00d4b4':b.vendorStatus==='rejected'?'#ff4d4d':'var(--gold)'}">${b.vendorStatus || 'pending'}</td>
-                        <td>
-                            ${b.status === 'approved' && (!b.vendorStatus || b.vendorStatus === 'pending') ? `
-                                <button class="btn btn-accept" onclick="vendorAction('${b._id}', 'accept')">Accept</button>
-                                <button class="btn btn-reject" onclick="vendorAction('${b._id}', 'reject')">Reject</button>
-                            ` : '—'}
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (err) {
-                console.error(err);
-                document.getElementById('vendor-bookings').innerHTML = '<tr><td colspan="7" style="text-align:center;color:red;">Error loading bookings.</td></tr>';
-            }
-        };
-
-        window.vendorAction = async (id, action) => {
-            if (!confirm(`Are you sure you want to ${action} this booking?`)) return;
-            try {
-                const res = await fetch(`${API}/vendor/bookings/${id}/${action}`, {
-                    method: 'PUT'
-                });
-                const json = await res.json();
-                if (!res.ok) throw new Error(json.message);
-                alert(`Booking ${action}ed!`);
-                loadBookings();
-            } catch (err) {
-                alert('Error: ' + err.message);
-            }
-        };
-
-        loadBookings();
-    </script>
+    <script src="js/vendor.js"></script>
 </body>
 </html>

@@ -46,13 +46,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. Fetch Bookings
     async function fetchAssignedBookings() {
         try {
-            const res = await fetch(`${CONFIG.API_BASE}/api/bookings`);
+            const res = await fetch('https://raotravels-backend.onrender.com/api/vendor/bookings', {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
             const data = await res.json();
+            console.log(data);
             
             if (res.ok) {
+                // The new vendor route returns { success: true, data: [...] }
+                const bookingsArray = data.data || data;
+                
                 // Filter: only show bookings where Admin approved them
                 // and maybe vendorStatus exists (assuming 'pending' is default)
-                const assignedBookings = data.filter(b => b.status === 'approved');
+                const assignedBookings = bookingsArray.filter(b => b.status === 'approved');
                 renderBookings(assignedBookings);
             } else {
                 showToast('Failed to fetch bookings', 'error');

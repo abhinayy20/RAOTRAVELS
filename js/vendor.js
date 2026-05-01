@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (vendorStatus === 'pending') {
                 actionsHTML = `
                     <div class="card-actions" id="actions-${booking._id}">
-                        <button class="btn-action btn-accept" onclick="handleVendorAction('${booking._id}', 'confirmed')">
+                        <button class="btn-action btn-accept" onclick="handleVendorAction('${booking._id}', 'accepted')">
                             <i class="fas fa-check"></i> Accept
                         </button>
                         <button class="btn-action btn-reject" onclick="handleVendorAction('${booking._id}', 'rejected')">
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </button>
                     </div>
                 `;
-            } else if (vendorStatus === 'confirmed') {
+            } else if (vendorStatus === 'accepted') {
                 actionsHTML = `<div class="vendor-status-indicator indicator-confirmed"><i class="fas fa-check-circle"></i> Accepted</div>`;
             } else if (vendorStatus === 'rejected') {
                 actionsHTML = `<div class="vendor-status-indicator indicator-rejected"><i class="fas fa-times-circle"></i> Rejected</div>`;
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="card-body">
                     <div class="detail-row">
                         <span class="detail-label"><i class="fas fa-user"></i> Customer</span>
-                        <span class="detail-value">${booking.customerName}</span>
+                        <span class="detail-value">${booking.name || 'Unknown'}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label"><i class="fas fa-users"></i> Travelers</span>
@@ -177,15 +177,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // Disable buttons & show loading state
         buttons.forEach(btn => {
             btn.disabled = true;
-            if (btn.classList.contains(`btn-${status === 'confirmed' ? 'accept' : 'reject'}`)) {
+            if (btn.classList.contains(`btn-${status === 'accepted' ? 'accept' : 'reject'}`)) {
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
             }
         });
 
         try {
-            const res = await fetch(`${CONFIG.API_BASE}/api/bookings/${bookingId}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+            const token = localStorage.getItem('vendorToken');
+            const res = await fetch(`https://raotravels-backend.onrender.com/api/vendor/update-status/${bookingId}`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ vendorStatus: status })
             });
 
@@ -194,9 +198,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.ok) {
                 showToast(`Booking successfully ${status}!`, 'success');
                 // Replace action buttons with status indicator
-                const indicatorClass = status === 'confirmed' ? 'indicator-confirmed' : 'indicator-rejected';
-                const indicatorIcon = status === 'confirmed' ? 'fa-check-circle' : 'fa-times-circle';
-                const indicatorText = status === 'confirmed' ? 'Accepted' : 'Rejected';
+                const indicatorClass = status === 'accepted' ? 'indicator-confirmed' : 'indicator-rejected';
+                const indicatorIcon = status === 'accepted' ? 'fa-check-circle' : 'fa-times-circle';
+                const indicatorText = status === 'accepted' ? 'Accepted' : 'Rejected';
                 
                 actionDiv.outerHTML = `<div class="vendor-status-indicator ${indicatorClass}">
                     <i class="fas ${indicatorIcon}"></i> ${indicatorText}

@@ -112,6 +112,38 @@ const rejectBooking = async (req, res) => {
     }
 };
 
+// @desc    Update Vendor Status
+// @route   PUT /api/vendor/update-status/:id
+// @access  Vendor Private
+const updateVendorStatus = async (req, res) => {
+    try {
+        const { vendorStatus } = req.body;
+        
+        if (!['accepted', 'rejected'].includes(vendorStatus)) {
+            return res.status(400).json({ success: false, message: 'Invalid status' });
+        }
+
+        const updateData = { vendorStatus };
+        if (vendorStatus === 'accepted') {
+            updateData.status = 'confirmed';
+        }
+
+        const booking = await Booking.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            { new: true, runValidators: true }
+        );
+
+        if (!booking) {
+            return res.status(404).json({ success: false, message: 'Booking not found' });
+        }
+
+        res.status(200).json({ success: true, booking });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
 // @desc    Get all bookings for vendor
 // @route   GET /api/vendor/bookings
 // @access  Public (Simulation)
@@ -124,4 +156,4 @@ const getVendorBookings = async (req, res) => {
     }
 };
 
-module.exports = { registerVendor, loginVendor, acceptBooking, rejectBooking, getVendorBookings };
+module.exports = { registerVendor, loginVendor, acceptBooking, rejectBooking, updateVendorStatus, getVendorBookings };

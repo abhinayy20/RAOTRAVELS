@@ -265,56 +265,96 @@ window.deleteTour = async (id) => {
 // ============================================================
 //  BOOKINGS MANAGEMENT — with Approve / Reject workflow
 // ============================================================
+let allBookings = [];  // Store all bookings for filtering
+
 const loadBookings = async () => {
     try {
         const res     = await fetch(`${API}/bookings`, { headers: authHeader() });
         const json    = await res.json();
-        const bookings = json.data || [];
-        const tbody   = document.getElementById('bookings-table-body');
-
-        if (bookings.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text-muted);">No bookings yet.</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = bookings.map(b => `
-            <tr id="row-${b._id}">
-                <td><strong>${b.name}</strong><br><small style="color:var(--text-muted);">${b.email}</small></td>
-                <td>${b.phone}</td>
-                <td>${b.tourId ? b.tourId.title : 'Deleted Tour'}</td>
-                <td>${formatDate(b.date)}</td>
-                <td>${b.travelers}</td>
-                <td>${formatPrice(b.totalPrice || 0)}</td>
-                <td>${statusBadge(b.status)}</td>
-                <td>${vendorBadge(b.vendorStatus)}</td>
-                <td><span class="vendor-label">${b.assignedVendor || '—'}</span></td>
-                <td>
-                    <div class="action-btns">
-                        ${b.status === 'pending' ? `
-                            <button class="btn btn-sm btn-approve" onclick="adminBookingAction('${b._id}', 'approve')">
-                                <i class="fas fa-check"></i> Approve
-                            </button>
-                            <button class="btn btn-sm btn-delete" onclick="adminBookingAction('${b._id}', 'reject')">
-                                <i class="fas fa-times"></i> Reject
-                            </button>
-                        ` : b.status === 'approved' ? `
-                            <span style="color:var(--teal);font-size:0.82rem;"><i class="fas fa-hourglass-half"></i> Awaiting Vendor</span>
-                            <button class="btn btn-sm btn-delete" onclick="adminBookingAction('${b._id}', 'reject')" style="margin-top:4px;">
-                                <i class="fas fa-times"></i> Reject
-                            </button>
-                        ` : b.status === 'confirmed' ? `
-                            <span style="color:#00d4b4;font-size:0.82rem;"><i class="fas fa-check-double"></i> Confirmed</span>
-                        ` : `
-                            <span style="color:#ff4d4d;font-size:0.82rem;text-transform:capitalize;"><i class="fas fa-times-circle"></i> ${b.status}</span>
-                        `}
-                    </div>
-                </td>
-            </tr>
-        `).join('');
+        allBookings   = json.data || [];
+        
+        renderBookingsTable(allBookings);
     } catch (err) {
         console.error('Load bookings error:', err);
     }
 };
+
+// Render bookings table with current filter
+const renderBookingsTable = (bookings) => {
+    const tbody = document.getElementById('bookings-table-body');
+
+    if (bookings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text-muted);">No bookings found.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = bookings.map(b => `
+        <tr id="row-${b._id}">
+            <td><strong>${b.name}</strong><br><small style="color:var(--text-muted);">${b.email}</small></td>
+            <td>${b.phone}</td>
+            <td>${b.tourId ? b.tourId.title : 'Deleted Tour'}</td>
+            <td>${formatDate(b.date)}</td>
+            <td>${b.travelers}</td>
+            <td>${formatPrice(b.totalPrice || 0)}</td>
+            <td>${statusBadge(b.status)}</td>
+            <td>${vendorBadge(b.vendorStatus)}</td>
+            <td><span class="vendor-label">${b.assignedVendor || '—'}</span></td>
+            <td>
+                <div class="action-btns">
+                    ${b.status === 'pending' ? `
+                        <button class="btn btn-sm btn-approve" onclick="adminBookingAction('${b._id}', 'approve')">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="btn btn-sm btn-delete" onclick="adminBookingAction('${b._id}', 'reject')">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    ` : b.status === 'approved' ? `
+                        <span style="color:var(--teal);font-size:0.82rem;"><i class="fas fa-hourglass-half"></i> Awaiting Vendor</span>
+                        <button class="btn btn-sm btn-delete" onclick="adminBookingAction('${b._id}', 'reject')" style="margin-top:4px;">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    ` : b.status === 'confirmed' ? `
+                        <span style="color:#00d4b4;font-size:0.82rem;"><i class="fas fa-check-double"></i> Confirmed</span>
+                    ` : `
+                        <span style="color:#ff4d4d;font-size:0.82rem;text-transform:capitalize;"><i class="fas fa-times-circle"></i> ${b.status}</span>
+                    `}
+                </div>
+            </td>
+        </tr>
+    `).join('');
+};
+
+// Filter bookings based on search and filters
+const applyBookingsFilter = () => {
+    const searchTerm = (document.getElementById('admin-search-bookings')?.value || '').toLowerCase();
+    const statusFilter = document.getElementById('admin-status-filter')?.value || '';
+    const vendorFilter = document.getElementById('admin-vendor-filter')?.value || '';
+
+    let filtered = allBookings.filter(b => {
+        const matchesSearch = !searchTerm || 
+            b.name.toLowerCase().includes(searchTerm) ||
+            b._id.toLowerCase().includes(searchTerm) ||
+            (b.email && b.email.toLowerCase().includes(searchTerm));
+
+        const matchesStatus = !statusFilter || (b.status === statusFilter);
+        const matchesVendor = !vendorFilter || (b.vendorStatus === vendorFilter);
+
+        return matchesSearch && matchesStatus && matchesVendor;
+    });
+
+    renderBookingsTable(filtered);
+};
+
+// Attach filter listeners
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('admin-search-bookings');
+    const statusFilter = document.getElementById('admin-status-filter');
+    const vendorFilter = document.getElementById('admin-vendor-filter');
+
+    if (searchInput) searchInput.addEventListener('input', applyBookingsFilter);
+    if (statusFilter) statusFilter.addEventListener('change', applyBookingsFilter);
+    if (vendorFilter) vendorFilter.addEventListener('change', applyBookingsFilter);
+});
 
 // Admin Approve / Reject
 window.adminBookingAction = async (id, action) => {

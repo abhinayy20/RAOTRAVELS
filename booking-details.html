@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Details | RAO TRAVELS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/vendor.css">
+    <link rel="stylesheet" href="css/booking-details.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="vendor-header">
+        <div class="brand-wrapper">
+            <a href="vendor.html" style="text-decoration: none; color: inherit;">
+                <h1><span class="gold">RAO</span>TRAVELS</h1>
+            </a>
+            <span class="vendor-badge"><i class="fas fa-handshake"></i> Vendor Portal</span>
+        </div>
+        <div class="header-right">
+            <button id="logout-btn" class="btn-logout">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container details-container">
+        <!-- Back Button -->
+        <div class="breadcrumb">
+            <a href="vendor.html"><i class="fas fa-arrow-left"></i> Back to Bookings</a>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-state" id="loading-state">
+            <div class="spinner-wrap">
+                <i class="fas fa-circle-notch fa-spin"></i>
+            </div>
+            <p>Loading booking details...</p>
+        </div>
+
+        <!-- Details Content -->
+        <div id="details-content" style="display: none;">
+            <!-- Header Section -->
+            <div class="details-header">
+                <div class="header-top">
+                    <div>
+                        <h1 id="booking-title">Booking Details</h1>
+                        <p id="booking-id-display" class="booking-id"></p>
+                    </div>
+                    <div id="status-section" class="status-section"></div>
+                </div>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="details-grid">
+                <!-- Left Column: Tour & Customer Info -->
+                <div class="details-column">
+                    <!-- Tour Information -->
+                    <div class="detail-card">
+                        <div class="card-header-section">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <h3>Tour Information</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Tour Name</label>
+                                <p id="tour-name"></p>
+                            </div>
+                            <div class="info-item">
+                                <label>Location</label>
+                                <p id="tour-location"></p>
+                            </div>
+                            <div class="info-item">
+                                <label>Duration</label>
+                                <p id="tour-duration"></p>
+                            </div>
+                            <div class="info-item">
+                                <label>Tour Price</label>
+                                <p id="tour-price" class="price-highlight"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Information -->
+                    <div class="detail-card">
+                        <div class="card-header-section">
+                            <i class="fas fa-user-circle"></i>
+                            <h3>Customer Information</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Full Name</label>
+                                <p id="customer-name"></p>
+                            </div>
+                            <div class="info-item">
+                                <label>Email Address</label>
+                                <p id="customer-email"></p>
+                            </div>
+                            <div class="info-item">
+                                <label>Phone Number</label>
+                                <p id="customer-phone"></p>
+                            </div>
+                            <div class="info-item">
+                                <label>Address</label>
+                                <p id="customer-address"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Booking Details -->
+                <div class="details-column">
+                    <!-- Booking Details -->
+                    <div class="detail-card">
+                        <div class="card-header-section">
+                            <i class="fas fa-calendar-check"></i>
+                            <h3>Booking Details</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Number of Travelers</label>
+                                <p id="travelers-count"></p>
+                            </div>
+                            <div class="info-item">
+                                <label>Tour Date</label>
+                                <p id="tour-date"></p>
+                            </div>
+                            <div class="info-item">
+                                <label>Booking Date</label>
+                                <p id="booking-date"></p>
+                            </div>
+                            <div class="info-item">
+                                <label>Special Requests</label>
+                                <p id="special-requests" class="text-muted">None</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment & Pricing -->
+                    <div class="detail-card">
+                        <div class="card-header-section">
+                            <i class="fas fa-credit-card"></i>
+                            <h3>Payment & Pricing</h3>
+                        </div>
+                        <div class="pricing-breakdown">
+                            <div class="pricing-row">
+                                <span>Tour Price × Travelers</span>
+                                <span id="base-total"></span>
+                            </div>
+                            <div class="pricing-row">
+                                <span>Tax (GST 18%)</span>
+                                <span id="tax-amount"></span>
+                            </div>
+                            <div class="pricing-row total">
+                                <span>Total Amount</span>
+                                <span id="total-amount" class="amount-highlight"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Status Timeline -->
+                    <div class="detail-card">
+                        <div class="card-header-section">
+                            <i class="fas fa-stream"></i>
+                            <h3>Workflow Timeline</h3>
+                        </div>
+                        <div class="timeline" id="timeline-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Section -->
+            <div class="actions-section" id="actions-section"></div>
+        </div>
+    </main>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/booking-details.js"></script>
+</body>
+</html>

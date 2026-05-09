@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings | RAO TRAVELS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/my-bookings.css">
+</head>
+<body>
+    <div class="bg-layer"></div>
+
+    <!-- Header -->
+    <nav class="navbar" id="navbar">
+        <div class="logo">RAO<span style="color: var(--text-primary); font-weight: 300;">TRAVELS</span></div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#bookings">My Bookings</a></li>
+            <li><a href="index.html#packages">Packages</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button id="logout-user-btn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="bookings-container">
+        <!-- Page Header -->
+        <div class="bookings-header">
+            <div>
+                <h1>My Bookings</h1>
+                <p>Track and manage all your tour reservations</p>
+            </div>
+            <div class="header-stats">
+                <div class="stat">
+                    <div class="stat-value" id="stat-total">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="stat-pending">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="stat-confirmed">0</div>
+                    <div class="stat-label">Confirmed</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters & Search -->
+        <div class="bookings-controls">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="Search by booking ID or tour name...">
+            </div>
+            <div class="filter-group">
+                <select id="status-filter" class="filter-select">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Bookings Content -->
+        <div id="bookings-content">
+            <!-- Loading State -->
+            <div class="loading-state" id="loading-state">
+                <div class="spinner-wrap">
+                    <i class="fas fa-circle-notch fa-spin"></i>
+                </div>
+                <p>Loading your bookings...</p>
+            </div>
+
+            <!-- Bookings List -->
+            <div class="bookings-list" id="bookings-list" style="display: none;"></div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="empty-state" style="display: none;">
+                <div class="empty-icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <h3>No bookings yet</h3>
+                <p>Start your journey by booking a tour package</p>
+                <a href="index.html#packages" class="btn-primary-cta">Explore Tours</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/my-bookings.js"></script>
+</body>
+</html>

@@ -4,59 +4,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vendor Dashboard | RAO TRAVELS</title>
+    <meta name="description" content="RAO Travels Vendor Portal — manage and process your assigned tour bookings.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/vendor.css">
 </head>
 <body>
 
-    <!-- Header -->
+    <!-- ===== HEADER ===== -->
     <header class="vendor-header">
         <div class="brand-wrapper">
             <h1><span class="gold">RAO</span>TRAVELS</h1>
-            <span class="vendor-badge"><i class="fas fa-handshake"></i> Vendor Portal</span>
+            <span class="vendor-badge">
+                <i class="fas fa-handshake"></i> Vendor Portal
+            </span>
         </div>
         <div class="header-right">
+            <div class="header-info">
+                <span class="dot"></span>
+                <span id="vendor-name-label">Vendor Dashboard</span>
+            </div>
             <button id="logout-btn" class="btn-logout">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </button>
         </div>
     </header>
 
-    <!-- Main Content -->
+    <!-- ===== MAIN ===== -->
     <main class="main-container">
-        <div class="page-title">
-            <h2>Assigned Bookings</h2>
-            <span id="booking-stats">Loading...</span>
-        </div>
 
+        <!-- Page Hero / Stats -->
+        <section class="page-hero">
+            <div class="hero-text">
+                <h2>Assigned Bookings</h2>
+                <p>Review and process your customer tour requests below.</p>
+            </div>
+            <div class="stats-strip" id="stats-strip">
+                <div class="stat-chip chip-total">
+                    <span class="stat-num" id="stat-total">—</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-chip chip-pending">
+                    <span class="stat-num" id="stat-pending">—</span>
+                    <span class="stat-label">Pending</span>
+                </div>
+                <div class="stat-chip chip-accepted">
+                    <span class="stat-num" id="stat-accepted">—</span>
+                    <span class="stat-label">Accepted</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Content Area -->
         <div id="vendor-content">
+
             <!-- Loading State -->
             <div class="loading-state" id="loading-state">
-                <i class="fas fa-circle-notch fa-spin"></i>
+                <div class="spinner-wrap">
+                    <i class="fas fa-circle-notch fa-spin"></i>
+                </div>
                 <p>Loading your assignments...</p>
             </div>
-            
+
             <!-- Bookings Grid -->
-            <div class="bookings-grid" id="bookings-grid" style="display: none;">
-                <!-- Cards will be injected here via JS -->
-            </div>
+            <div class="bookings-grid" id="bookings-grid" style="display:none;"></div>
 
             <!-- Empty State -->
-            <div class="empty-state" id="empty-state" style="display: none;">
-                <i class="fas fa-box-open"></i>
+            <div class="empty-state" id="empty-state" style="display:none;">
+                <div class="empty-icon-wrap">
+                    <i class="fas fa-box-open"></i>
+                </div>
                 <h3>No pending assignments</h3>
-                <p>You currently don't have any new bookings to process.</p>
+                <p>You don't have any new bookings to process right now. Check back later.</p>
             </div>
+
         </div>
     </main>
 
-    <!-- Toasts -->
+    <!-- ===== TOAST CONTAINER ===== -->
     <div class="toast-container" id="toast-container"></div>
 
-    <!-- Scripts -->
+    <!-- ===== SCRIPTS ===== -->
     <script src="js/config.js"></script>
     <script src="js/vendor.js"></script>
 </body>

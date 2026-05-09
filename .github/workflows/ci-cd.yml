@@ -1,0 +1,127 @@
+name: RAO Travels - Full CI/CD Pipeline
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  DOCKER_FRONTEND_IMAGE: ${{ secrets.DOCKER_USERNAME }}/rao-travels-frontend
+  DOCKER_BACKEND_IMAGE: ${{ secrets.DOCKER_USERNAME }}/rao-travels-backend
+
+jobs:
+  # STAGE 1 & 2: Checkout and Secret Scan
+  security-and-quality:
+    name: Security and Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks Secret Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: SonarQube Analysis
+        uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+  # STAGE 4 & 5: Docker Build and Trivy Scan
+  build-and-scan:
+    name: Build and Scan Images
+    needs: security-and-quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Backend Build and Scan
+      - name: Build Backend Image
+        run: docker build -t ${{ env.DOCKER_BACKEND_IMAGE }}:${{ github.sha }} ./backend
+
+      - name: Trivy Scan Backend
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ env.DOCKER_BACKEND_IMAGE }}:${{ github.sha }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL'
+
+      # Frontend Build and Scan
+      - name: Build Frontend Image
+        run: docker build -t ${{ env.DOCKER_FRONTEND_IMAGE }}:${{ github.sha }} .
+
+      - name: Trivy Scan Frontend
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ env.DOCKER_FRONTEND_IMAGE }}:${{ github.sha }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL'
+
+  # STAGE 6: Push to Docker Hub
+  push-images:
+    name: Publish to Docker Hub
+    needs: build-and-scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Images
+        run: |
+          docker build -t ${{ env.DOCKER_BACKEND_IMAGE }}:${{ github.sha }} -t ${{ env.DOCKER_BACKEND_IMAGE }}:latest ./backend
+          docker build -t ${{ env.DOCKER_FRONTEND_IMAGE }}:${{ github.sha }} -t ${{ env.DOCKER_FRONTEND_IMAGE }}:latest .
+          docker push ${{ env.DOCKER_BACKEND_IMAGE }} --all-tags
+          docker push ${{ env.DOCKER_FRONTEND_IMAGE }} --all-tags
+
+  # STAGE 7: K8s Deployment Prep
+  deploy-prep:
+    name: Kubernetes Deployment Preparation
+    needs: push-images
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Validate K8s Manifests
+        run: |
+          kubectl apply --dry-run=client -f k8s/
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      # Future Step: Deployment to AKS
+      # - name: Deploy to AKS
+      #   uses: azure/k8s-deploy@v4
+      #   with:
+      #     manifests: |
+      #       k8s/frontend-deployment.yaml
+      #       k8s/backend-deployment.yaml
+      #       k8s/services.yaml
+      #       k8s/ingress.yaml
+      #     images: |
+      #       ${{ env.DOCKER_FRONTEND_IMAGE }}:${{ github.sha }}
+      #       ${{ env.DOCKER_BACKEND_IMAGE }}:${{ github.sha }}
+      #     namespace: rao-travels

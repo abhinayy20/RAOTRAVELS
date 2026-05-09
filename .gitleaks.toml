@@ -1,0 +1,10 @@
+# Gitleaks configuration file
+[allowlist]
+description = "Ignore safe files"
+paths = [
+    "node_modules",
+    "backend/node_modules",
+    "k8s/secrets.yaml", # We know this contains placeholders now
+    "DOCKER_GUIDE.md",
+    "K8S_GUIDE.md"
+]

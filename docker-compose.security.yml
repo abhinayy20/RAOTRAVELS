@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Trivy - Scan images for vulnerabilities
+  trivy-frontend:
+    image: aquasec/trivy:latest
+    command: image --severity HIGH,CRITICAL rao-travels-frontend:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./.trivy-cache:/root/.cache
+
+  trivy-backend:
+    image: aquasec/trivy:latest
+    command: image --severity HIGH,CRITICAL rao-travels-backend:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./.trivy-cache:/root/.cache
+
+  # OWASP ZAP - Baseline scan for frontend
+  zap-scan:
+    image: owasp/zap2docker-stable
+    command: zap-baseline.py -t http://frontend -r zap_report.html
+    depends_on:
+      - frontend
+    networks:
+      - rao-network
+
+  # Gitleaks - Local scan (Optional, usually run in CI)
+  gitleaks:
+    image: zricethezav/gitleaks:latest
+    command: detect --source=/path/to/repo -v
+    volumes:
+      - .:/path/to/repo

@@ -186,6 +186,7 @@
                                 <th>Date</th>
                                 <th>Travelers</th>
                                 <th>Total</th>
+                                <th>Commission</th>
                                 <th>Status</th>
                                 <th>Vendor Status</th>
                                 <th>Assigned To</th>
@@ -193,7 +194,7 @@
                             </tr>
                         </thead>
                         <tbody id="bookings-table-body">
-                            <tr><td colspan="10" style="text-align:center;">Loading...</td></tr>
+                            <tr><td colspan="11" style="text-align:center;">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -201,6 +202,82 @@
         </section>
 
     </main>
+
+    <!-- ============================================================
+         VENDOR ASSIGNMENT MODAL
+         ============================================================ -->
+    <div class="modal-overlay" id="vendor-modal-overlay">
+        <div class="modal-box" id="vendor-modal">
+            <!-- Header -->
+            <div class="modal-header">
+                <div class="modal-header-icon">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div>
+                    <h2 class="modal-title">Assign Vendor</h2>
+                    <p class="modal-subtitle" id="modal-booking-info">Loading booking details...</p>
+                </div>
+                <button class="modal-close-btn" onclick="closeVendorModal()" id="modal-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Commission Preview -->
+            <div class="commission-preview" id="commission-preview" style="display:none;">
+                <div class="commission-row">
+                    <span class="commission-label"><i class="fas fa-receipt"></i> Trip Total</span>
+                    <span class="commission-value" id="cp-total">—</span>
+                </div>
+                <div class="commission-divider"></div>
+                <div class="commission-row">
+                    <span class="commission-label vendor-share"><i class="fas fa-handshake"></i> Vendor Gets (80%)</span>
+                    <span class="commission-value vendor-share" id="cp-vendor">—</span>
+                </div>
+                <div class="commission-row">
+                    <span class="commission-label platform-share"><i class="fas fa-building"></i> Platform Keeps (20%)</span>
+                    <span class="commission-value platform-share" id="cp-platform">—</span>
+                </div>
+            </div>
+
+            <!-- Vendor Selection -->
+            <div class="modal-body">
+                <label class="modal-label">Select Registered Vendor</label>
+                <div class="vendor-select-wrapper">
+                    <i class="fas fa-store vendor-select-icon"></i>
+                    <select id="vendor-dropdown" class="vendor-dropdown" onchange="onVendorDropdownChange()">
+                        <option value="">— Loading vendors... —</option>
+                    </select>
+                    <i class="fas fa-chevron-down vendor-select-chevron"></i>
+                </div>
+
+                <!-- Selected vendor card -->
+                <div class="vendor-card" id="vendor-card" style="display:none;">
+                    <div class="vendor-card-avatar" id="vendor-card-avatar">R</div>
+                    <div class="vendor-card-info">
+                        <div class="vendor-card-name" id="vendor-card-name">—</div>
+                        <div class="vendor-card-email" id="vendor-card-email">—</div>
+                    </div>
+                    <span class="vendor-card-badge"><i class="fas fa-check-circle"></i> Registered</span>
+                </div>
+
+                <!-- No vendors state -->
+                <div class="no-vendors-msg" id="no-vendors-msg" style="display:none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    No registered vendors found. Please ask vendors to register first.
+                </div>
+            </div>
+
+            <!-- Modal Actions -->
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeVendorModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="btn btn-gold" id="assign-vendor-btn" onclick="confirmVendorAssignment()" disabled>
+                    <i class="fas fa-user-check"></i> Assign Vendor
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>

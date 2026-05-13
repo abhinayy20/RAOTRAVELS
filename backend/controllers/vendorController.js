@@ -74,51 +74,97 @@ const loginVendor = async (req, res) => {
     }
 };
 
-// @desc    Accept booking
+// @desc    Get bookings assigned to the authenticated vendor
+// @route   GET /api/vendor/bookings
+// @access  Vendor Private
+const getVendorBookings = async (req, res) => {
+    try {
+        // Extract vendor ID from Authorization header token
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ success: false, message: 'Not authorized — no token' });
+        }
+
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+        } catch {
+            return res.status(401).json({ success: false, message: 'Not authorized — invalid token' });
+        }
+
+        // Only fetch bookings assigned to this vendor
+        const bookings = await Booking.find({ assignedVendorId: decoded.id })
+            .populate('tourId', 'title location images price');
+
+        res.status(200).json({ success: true, data: bookings });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
+// @desc    Vendor accepts a booking assigned to them
 // @route   PUT /api/vendor/bookings/:id/accept
-// @access  Public (Simulation)
+// @access  Vendor Private
 const acceptBooking = async (req, res) => {
     try {
-        const booking = await Booking.findByIdAndUpdate(
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ success: false, message: 'Not authorized' });
+        }
+        const decoded = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
+
+        // Ensure the booking belongs to this vendor
+        const booking = await Booking.findOne({ _id: req.params.id, assignedVendorId: decoded.id });
+        if (!booking) {
+            return res.status(404).json({ success: false, message: 'Booking not found or not assigned to you' });
+        }
+
+        const updated = await Booking.findByIdAndUpdate(
             req.params.id,
             { vendorStatus: 'accepted', status: 'confirmed' },
             { new: true, runValidators: true }
         );
-        if (!booking) {
-            return res.status(404).json({ success: false, message: 'Booking not found' });
-        }
-        res.status(200).json({ success: true, booking });
+        res.status(200).json({ success: true, booking: updated });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
 };
 
-// @desc    Reject booking
+// @desc    Vendor rejects a booking assigned to them
 // @route   PUT /api/vendor/bookings/:id/reject
-// @access  Public (Simulation)
+// @access  Vendor Private
 const rejectBooking = async (req, res) => {
     try {
-        const booking = await Booking.findByIdAndUpdate(
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ success: false, message: 'Not authorized' });
+        }
+        const decoded = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
+
+        const booking = await Booking.findOne({ _id: req.params.id, assignedVendorId: decoded.id });
+        if (!booking) {
+            return res.status(404).json({ success: false, message: 'Booking not found or not assigned to you' });
+        }
+
+        const updated = await Booking.findByIdAndUpdate(
             req.params.id,
             { vendorStatus: 'rejected' },
             { new: true, runValidators: true }
         );
-        if (!booking) {
-            return res.status(404).json({ success: false, message: 'Booking not found' });
-        }
-        res.status(200).json({ success: true, booking });
+        res.status(200).json({ success: true, booking: updated });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
 };
 
-// @desc    Update Vendor Status
+// @desc    Vendor updates booking trip status
 // @route   PUT /api/vendor/update-status/:id
 // @access  Vendor Private
 const updateVendorStatus = async (req, res) => {
     try {
         const { vendorStatus } = req.body;
-        
+
         if (!['accepted', 'rejected'].includes(vendorStatus)) {
             return res.status(400).json({ success: false, message: 'Invalid status' });
         }
@@ -139,18 +185,6 @@ const updateVendorStatus = async (req, res) => {
         }
 
         res.status(200).json({ success: true, booking });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error', error: error.message });
-    }
-};
-
-// @desc    Get all bookings for vendor
-// @route   GET /api/vendor/bookings
-// @access  Public (Simulation)
-const getVendorBookings = async (req, res) => {
-    try {
-        const bookings = await Booking.find().populate('tourId', 'title');
-        res.status(200).json({ success: true, data: bookings });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }

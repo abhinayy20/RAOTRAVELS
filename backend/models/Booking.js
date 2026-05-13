@@ -43,12 +43,54 @@ const bookingSchema = new mongoose.Schema({
         enum: ['pending', 'accepted', 'rejected'],
         default: 'pending'
     },
+
+    // ---- Vendor Assignment (proper ObjectId reference) ----
+    assignedVendorId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Vendor',
+        default: null
+    },
+    assignedVendorName: {
+        type: String,
+        default: ''
+    },
+    // Kept for backward-compat with any existing data
     assignedVendor: {
         type: String,
         default: ''
     },
 
-    // Admin who acted on the booking
+    // ---- Commission Breakdown (80/20 split) ----
+    vendorCommission: {
+        type: Number,
+        default: 0  // 80% of totalPrice
+    },
+    platformCommission: {
+        type: Number,
+        default: 0  // 20% of totalPrice
+    },
+    payoutStatus: {
+        type: String,
+        enum: ['unpaid', 'paid'],
+        default: 'unpaid'
+    },
+
+    // ---- Trip Lifecycle ----
+    tripStatus: {
+        type: String,
+        enum: ['not_started', 'ongoing', 'completed', 'cancelled'],
+        default: 'not_started'
+    },
+    assignedAt: {
+        type: Date,
+        default: null
+    },
+    completedAt: {
+        type: Date,
+        default: null
+    },
+
+    // Admin notes
     adminNotes: {
         type: String,
         default: ''

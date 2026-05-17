@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <title>Admin Panel | RAO TRAVELS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,6 +22,7 @@
         <nav class="sidebar-nav">
             <a href="#" class="nav-item active" data-tab="dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
             <a href="#" class="nav-item" data-tab="tours"><i class="fas fa-map-marked-alt"></i> Manage Tours</a>
+            <a href="#" class="nav-item" data-tab="vendors"><i class="fas fa-store"></i> Vendors</a>
             <a href="#" class="nav-item" data-tab="bookings"><i class="fas fa-calendar-check"></i> Bookings</a>
         </nav>
         <div class="sidebar-footer">
@@ -145,6 +147,50 @@
                         </thead>
                         <tbody id="tours-table-body">
                             <tr><td colspan="6" style="text-align:center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======= VENDORS TAB ======= -->
+        <section class="tab-content" id="tab-vendors">
+            <div class="card">
+                <h3><i class="fas fa-store"></i> Vendor Management</h3>
+                
+                <!-- Vendor Tabs -->
+                <div class="vendor-sub-tabs" style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border);">
+                    <button class="vendor-tab-btn active" onclick="switchVendorView('all')" style="padding: 12px 20px; background: none; border: none; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;">
+                        <i class="fas fa-users"></i> All Vendors
+                    </button>
+                    <button class="vendor-tab-btn" onclick="switchVendorView('pending')" style="padding: 12px 20px; background: none; border: none; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;">
+                        <i class="fas fa-clock"></i> Pending <span id="pending-badge" style="background: #ff4d4d; color: white; border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem;">0</span>
+                    </button>
+                    <button class="vendor-tab-btn" onclick="switchVendorView('approved')" style="padding: 12px 20px; background: none; border: none; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;">
+                        <i class="fas fa-check-circle"></i> Approved
+                    </button>
+                    <button class="vendor-tab-btn" onclick="switchVendorView('rejected')" style="padding: 12px 20px; background: none; border: none; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;">
+                        <i class="fas fa-times-circle"></i> Rejected
+                    </button>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Company</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Region</th>
+                                <th>Status</th>
+                                <th>Active</th>
+                                <th>Commission</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vendors-table-body">
+                            <tr><td colspan="9" style="text-align:center;">Loading vendors...</td></tr>
                         </tbody>
                     </table>
                 </div>

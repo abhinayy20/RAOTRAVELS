@@ -62,8 +62,11 @@ const verifyToken = async (req, res) => {
 // @access  Private
 const getVendors = async (req, res) => {
     try {
-        // Return id, name, email — never password
-        const vendors = await Vendor.find({}, '_id name email createdAt');
+        // Return only approved and active vendors for assignment
+        const vendors = await Vendor.find(
+            { approvalStatus: 'approved', activeStatus: 'active' },
+            '_id fullName companyName email phone specialization region commissionRate'
+        ).sort({ fullName: 1 });
         res.status(200).json({ success: true, data: vendors });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error', error: error.message });
@@ -139,8 +142,8 @@ const assignVendor = async (req, res) => {
             req.params.id,
             {
                 assignedVendorId:   vendor._id,
-                assignedVendorName: vendor.name,
-                assignedVendor:     vendor.name,   // backward compat
+                assignedVendorName: vendor.fullName,
+                assignedVendor:     vendor.fullName,   // backward compat
                 vendorCommission,
                 platformCommission,
                 vendorStatus:       'pending',      // reset vendor response
@@ -148,11 +151,11 @@ const assignVendor = async (req, res) => {
                 assignedAt:         new Date()
             },
             { new: true, runValidators: true }
-        ).populate('assignedVendorId', 'name email');
+        ).populate('assignedVendorId', 'fullName email phone');
 
         res.status(200).json({
             success: true,
-            message: `Booking assigned to ${vendor.name}`,
+            message: `Booking assigned to ${vendor.fullName}`,
             booking,
             commission: {
                 total:    price,
@@ -166,4 +169,211 @@ const assignVendor = async (req, res) => {
     }
 };
 
-module.exports = { adminLogin, verifyToken, getVendors, approveBooking, rejectBooking, assignVendor };
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  VENDOR MANAGEMENT (Admin)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// @desc    Get all pending vendor approvals
+// @route   GET /api/admin/vendors/pending
+// @access  Private
+const getPendingVendors = async (req, res) => {
+    try {
+        const vendors = await Vendor.find({ approvalStatus: 'pending' })
+            .select('-password')
+            .sort({ createdAt: -1 });
+        res.status(200).json({ success: true, count: vendors.length, data: vendors });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
+// @desc    Get all vendors with filters
+// @route   GET /api/admin/vendors/all
+// @access  Private
+const getAllVendors = async (req, res) => {
+    try {
+        const { status, activeStatus } = req.query;
+        const filter = {};
+        
+        if (status) filter.approvalStatus = status;
+        if (activeStatus) filter.activeStatus = activeStatus;
+
+        const vendors = await Vendor.find(filter)
+            .select('-password')
+            .sort({ createdAt: -1 });
+        
+        res.status(200).json({ success: true, count: vendors.length, data: vendors });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
+// @desc    Approve a pending vendor
+// @route   PUT /api/admin/vendors/:id/approve
+// @access  Private
+const approveVendor = async (req, res) => {
+    try {
+        const vendor = await Vendor.findByIdAndUpdate(
+            req.params.id,
+            {
+                approvalStatus: 'approved',
+                activeStatus: 'active',
+                rejectionReason: ''
+            },
+            { new: true, runValidators: true }
+        ).select('-password');
+
+        if (!vendor) {
+            return res.status(404).json({ success: false, message: 'Vendor not found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `${vendor.fullName} has been approved and activated`,
+            vendor
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
+// @desc    Reject a pending vendor
+// @route   PUT /api/admin/vendors/:id/reject
+// @access  Private
+const rejectVendor = async (req, res) => {
+    try {
+        const { reason } = req.body;
+
+        if (!reason) {
+            return res.status(400).json({ success: false, message: 'Please provide rejection reason' });
+        }
+
+        const vendor = await Vendor.findByIdAndUpdate(
+            req.params.id,
+            {
+                approvalStatus: 'rejected',
+                activeStatus: 'inactive',
+                rejectionReason: reason
+            },
+            { new: true, runValidators: true }
+        ).select('-password');
+
+        if (!vendor) {
+            return res.status(404).json({ success: false, message: 'Vendor not found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `${vendor.fullName} registration has been rejected`,
+            vendor
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
+// @desc    Deactivate/Suspend a vendor
+// @route   PUT /api/admin/vendors/:id/deactivate
+// @access  Private
+const deactivateVendor = async (req, res) => {
+    try {
+        const { reason } = req.body;
+
+        const vendor = await Vendor.findByIdAndUpdate(
+            req.params.id,
+            {
+                activeStatus: 'suspended',
+                rejectionReason: reason || ''
+            },
+            { new: true, runValidators: true }
+        ).select('-password');
+
+        if (!vendor) {
+            return res.status(404).json({ success: false, message: 'Vendor not found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `${vendor.fullName} has been suspended`,
+            vendor
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
+// @desc    Reactivate a suspended vendor
+// @route   PUT /api/admin/vendors/:id/activate
+// @access  Private
+const activateVendor = async (req, res) => {
+    try {
+        const vendor = await Vendor.findByIdAndUpdate(
+            req.params.id,
+            {
+                activeStatus: 'active',
+                rejectionReason: ''
+            },
+            { new: true, runValidators: true }
+        ).select('-password');
+
+        if (!vendor) {
+            return res.status(404).json({ success: false, message: 'Vendor not found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `${vendor.fullName} has been reactivated`,
+            vendor
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
+// @desc    Edit vendor details
+// @route   PUT /api/admin/vendors/:id/edit
+// @access  Private
+const editVendor = async (req, res) => {
+    try {
+        const { specialization, region, commissionRate } = req.body;
+        
+        const updateData = {};
+        if (specialization) updateData.specialization = specialization;
+        if (region) updateData.region = region;
+        if (commissionRate !== undefined) updateData.commissionRate = commissionRate;
+
+        const vendor = await Vendor.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            { new: true, runValidators: true }
+        ).select('-password');
+
+        if (!vendor) {
+            return res.status(404).json({ success: false, message: 'Vendor not found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `${vendor.fullName} details updated`,
+            vendor
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
+module.exports = {
+    adminLogin,
+    verifyToken,
+    getVendors,
+    getPendingVendors,
+    getAllVendors,
+    approveVendor,
+    rejectVendor,
+    deactivateVendor,
+    activateVendor,
+    editVendor,
+    approveBooking,
+    rejectBooking,
+    assignVendor
+};

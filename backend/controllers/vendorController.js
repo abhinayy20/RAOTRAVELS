@@ -7,25 +7,49 @@ const Booking = require('../models/Booking');
 // @access  Public
 const registerVendor = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const {
+            fullName,
+            companyName,
+            email,
+            phone,
+            password,
+            specialization,
+            region
+        } = req.body;
+
+        // Validate required fields
+        if (!fullName || !companyName || !email || !phone || !password || !region) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide all required fields: fullName, companyName, email, phone, password, region'
+            });
+        }
 
         const vendorExists = await Vendor.findOne({ email });
         if (vendorExists) {
-            return res.status(400).json({ success: false, message: 'Vendor already exists' });
+            return res.status(400).json({ success: false, message: 'Email already registered' });
         }
 
-        const vendor = await Vendor.create({ name, email, password });
-
-        const token = jwt.sign({ id: vendor._id, role: vendor.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+        const vendor = await Vendor.create({
+            fullName,
+            companyName,
+            email,
+            phone,
+            password,
+            specialization: specialization || 'Other',
+            region,
+            approvalStatus: 'pending',
+            activeStatus: 'inactive'
+        });
 
         res.status(201).json({
             success: true,
-            token,
+            message: 'Registration successful! Awaiting admin approval.',
             vendor: {
                 id: vendor._id,
-                name: vendor.name,
+                fullName: vendor.fullName,
                 email: vendor.email,
-                role: vendor.role
+                approvalStatus: vendor.approvalStatus
             }
         });
     } catch (error) {
@@ -50,6 +74,24 @@ const loginVendor = async (req, res) => {
             return res.status(401).json({ success: false, message: 'Invalid email or password' });
         }
 
+        // Check if vendor is approved
+        if (vendor.approvalStatus !== 'approved') {
+            return res.status(403).json({
+                success: false,
+                message: vendor.approvalStatus === 'pending'
+                    ? 'Your registration is pending admin approval. Please check back later.'
+                    : 'Your registration has been rejected. Please contact admin for details.'
+            });
+        }
+
+        // Check if vendor account is active
+        if (vendor.activeStatus !== 'active') {
+            return res.status(403).json({
+                success: false,
+                message: 'Your account is currently inactive. Please contact admin.'
+            });
+        }
+
         const isMatch = await vendor.matchPassword(password);
 
         if (!isMatch) {
@@ -63,7 +105,8 @@ const loginVendor = async (req, res) => {
             token,
             vendor: {
                 id: vendor._id,
-                name: vendor.name,
+                fullName: vendor.fullName,
+                companyName: vendor.companyName,
                 email: vendor.email,
                 role: vendor.role
             }

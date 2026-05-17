@@ -3,6 +3,13 @@ const {
     adminLogin,
     verifyToken,
     getVendors,
+    getPendingVendors,
+    getAllVendors,
+    approveVendor,
+    rejectVendor,
+    deactivateVendor,
+    activateVendor,
+    editVendor,
     approveBooking,
     rejectBooking,
     assignVendor
@@ -19,6 +26,15 @@ router.get('/verify', protect, verifyToken);
 
 // Vendor list for assignment dropdown
 router.get('/vendors', protect, getVendors);
+
+// ━━━ VENDOR MANAGEMENT ━━━
+router.get('/vendors/pending', protect, getPendingVendors);
+router.get('/vendors/all', protect, getAllVendors);
+router.put('/vendors/:id/approve', protect, approveVendor);
+router.put('/vendors/:id/reject', protect, rejectVendor);
+router.put('/vendors/:id/deactivate', protect, deactivateVendor);
+router.put('/vendors/:id/activate', protect, activateVendor);
+router.put('/vendors/:id/edit', protect, editVendor);
 
 // Booking workflow
 router.put('/bookings/:id/approve',       protect, approveBooking);

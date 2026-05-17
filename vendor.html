@@ -1,93 +1,349 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vendor Dashboard | RAO TRAVELS</title>
-    <meta name="description" content="RAO Travels Vendor Portal — manage and process your assigned tour bookings.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/vendor.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vendor Dashboard | RAO Travels</title>
+  <meta name="description" content="Vendor portal for RAO Travels – premium SaaS dashboard.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Vendor CSS -->
+  <link rel="stylesheet" href="css/vendor.css" />
 </head>
 <body>
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h1 class="brand"><span class="gold">RAO</span>TRAVELS</h1>
+      <button class="btn-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+    </div>
+    <ul class="nav-list">
+      <li><a href="#" class="nav-item active" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+      <li><a href="#" class="nav-item" data-section="assigned"><i class="fas fa-map-marker-alt"></i> Assigned Trips</a></li>
+      <li><a href="#" class="nav-item" data-section="accepted"><i class="fas fa-check"></i> Accepted Trips</a></li>
+      <li><a href="#" class="nav-item" data-section="completed"><i class="fas fa-flag-checkered"></i> Completed Trips</a></li>
+      <li><a href="#" class="nav-item" data-section="payouts"><i class="fas fa-wallet"></i> Payouts</a></li>
+      <li><a href="#" class="nav-item" data-section="commission"><i class="fas fa-percentage"></i> Commission</a></li>
+      <li><a href="#" class="nav-item" data-section="customers"><i class="fas fa-users"></i> Customers</a></li>
+      <li><a href="#" class="nav-item" data-section="profile"><i class="fas fa-user"></i> Profile</a></li>
+      <li><a href="#" class="nav-item" data-section="settings"><i class="fas fa-cog"></i> Settings</a></li>
+      <li><a href="#" class="nav-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+    <div class="theme-switcher">
+      <label class="switch">
+        <input type="checkbox" id="themeToggle">
+        <span class="slider round"></span>
+      </label>
+      <span class="theme-label">Dark Mode</span>
+    </div>
+  </nav>
 
-    <!-- ===== HEADER ===== -->
-    <header class="vendor-header">
-        <div class="brand-wrapper">
-            <h1><span class="gold">RAO</span>TRAVELS</h1>
-            <span class="vendor-badge">
-                <i class="fas fa-handshake"></i> Vendor Portal
-            </span>
-        </div>
-        <div class="header-right">
-            <div class="header-info">
-                <span class="dot"></span>
-                <span id="vendor-name-label">Vendor Dashboard</span>
-            </div>
-            <button id="logout-btn" class="btn-logout">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-        </div>
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
+    <!-- Header -->
+    <header class="header">
+      <div>
+        <h2 id="pageTitle">Dashboard</h2>
+        <p style="color:var(--text-secondary);font-size:0.85rem;margin-top:4px;">Welcome back, <span id="vendorName">Vendor</span></p>
+      </div>
+      <button class="btn-notifications" id="notifBtn"><i class="fas fa-bell"></i><span class="badge" id="unreadCount">0</span></button>
     </header>
 
-    <!-- ===== MAIN ===== -->
-    <main class="main-container">
-
-        <!-- Page Hero / Stats -->
-        <section class="page-hero">
-            <div class="hero-text">
-                <h2>Assigned Bookings</h2>
-                <p>Review and process your customer tour requests below.</p>
-            </div>
-            <div class="stats-strip" id="stats-strip">
-                <div class="stat-chip chip-total">
-                    <span class="stat-num" id="stat-total">—</span>
-                    <span class="stat-label">Total</span>
-                </div>
-                <div class="stat-chip chip-pending">
-                    <span class="stat-num" id="stat-pending">—</span>
-                    <span class="stat-label">Pending</span>
-                </div>
-                <div class="stat-chip chip-accepted">
-                    <span class="stat-num" id="stat-accepted">—</span>
-                    <span class="stat-label">Accepted</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- Content Area -->
-        <div id="vendor-content">
-
-            <!-- Loading State -->
-            <div class="loading-state" id="loading-state">
-                <div class="spinner-wrap">
-                    <i class="fas fa-circle-notch fa-spin"></i>
-                </div>
-                <p>Loading your assignments...</p>
-            </div>
-
-            <!-- Bookings Grid -->
-            <div class="bookings-grid" id="bookings-grid" style="display:none;"></div>
-
-            <!-- Empty State -->
-            <div class="empty-state" id="empty-state" style="display:none;">
-                <div class="empty-icon-wrap">
-                    <i class="fas fa-box-open"></i>
-                </div>
-                <h3>No pending assignments</h3>
-                <p>You don't have any new bookings to process right now. Check back later.</p>
-            </div>
-
+    <!-- Dashboard Section -->
+    <section class="section" id="dashboardSection">
+      <div class="cards-grid">
+        <div class="stat-card" id="cardAssigned">
+          <div class="card-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <div class="card-content">
+            <h3>Total Assigned Trips</h3>
+            <p class="counter" data-target="0">0</p>
+          </div>
         </div>
-    </main>
+        <div class="stat-card" id="cardPending">
+          <div class="card-icon"><i class="fas fa-hourglass-half"></i></div>
+          <div class="card-content">
+            <h3>Pending Acceptance</h3>
+            <p class="counter" data-target="0">0</p>
+          </div>
+        </div>
+        <div class="stat-card" id="cardAccepted">
+          <div class="card-icon"><i class="fas fa-check"></i></div>
+          <div class="card-content">
+            <h3>Accepted Trips</h3>
+            <p class="counter" data-target="0">0</p>
+          </div>
+        </div>
+        <div class="stat-card" id="cardCompleted">
+          <div class="card-icon"><i class="fas fa-flag-checkered"></i></div>
+          <div class="card-content">
+            <h3>Completed Trips</h3>
+            <p class="counter" data-target="0">0</p>
+          </div>
+        </div>
+        <div class="stat-card" id="cardEarnings">
+          <div class="card-icon"><i class="fas fa-coins"></i></div>
+          <div class="card-content">
+            <h3>Monthly Earnings</h3>
+            <p class="counter" data-target="0">₹0</p>
+          </div>
+        </div>
+        <div class="stat-card" id="cardPayouts">
+          <div class="card-icon"><i class="fas fa-wallet"></i></div>
+          <div class="card-content">
+            <h3>Pending Payouts</h3>
+            <p class="counter" data-target="0">₹0</p>
+          </div>
+        </div>
+      </div>
+      <!-- Charts -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>Monthly Earnings</h3>
+          <canvas id="earningsChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Trip Completion %</h3>
+          <canvas id="completionChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Bookings Handled</h3>
+          <canvas id="bookingsChart"></canvas>
+        </div>
+      </div>
+    </section>
 
-    <!-- ===== TOAST CONTAINER ===== -->
-    <div class="toast-container" id="toast-container"></div>
+    <!-- Recent Activity Feed -->
+    <section class="section" id="activitySection">
+      <h3>Recent Activity</h3>
+      <ul class="activity-feed" id="activityFeed">
+        <li><i class="fas fa-check-circle success"></i> Accepted <strong>Ladakh Expedition</strong></li>
+        <li><i class="fas fa-flag-checkered success"></i> Completed <strong>Kerala Trip</strong></li>
+        <li><i class="fas fa-user-plus info"></i> Admin assigned new trip <strong>Goa Getaway</strong></li>
+      </ul>
+    </section>
+  </section>
 
-    <!-- ===== SCRIPTS ===== -->
-    <script src="js/config.js"></script>
-    <script src="js/vendor.js"></script>
+  <!-- ====== ASSIGNED TRIPS SECTION ====== -->
+  <section class="dash-section" id="section-assigned" style="display:none;">
+    <div class="section-toolbar">
+      <h3 class="section-heading"><i class="fas fa-map-marker-alt"></i> Assigned Trips</h3>
+      <span class="section-badge" id="assignedCount">0 trips</span>
+    </div>
+    <div class="data-table-wrap">
+      <table class="data-table" id="assignedTable">
+        <thead><tr><th>Booking ID</th><th>Tour</th><th>Customer</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="assignedBody"><tr><td colspan="6" class="empty-row"><i class="fas fa-inbox"></i> No assigned trips yet</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ====== ACCEPTED TRIPS SECTION ====== -->
+  <section class="dash-section" id="section-accepted" style="display:none;">
+    <div class="section-toolbar">
+      <h3 class="section-heading"><i class="fas fa-check-double"></i> Accepted Trips</h3>
+      <span class="section-badge" id="acceptedCount">0 trips</span>
+    </div>
+    <div class="data-table-wrap">
+      <table class="data-table" id="acceptedTable">
+        <thead><tr><th>Booking ID</th><th>Tour</th><th>Customer</th><th>Departure</th><th>Commission</th><th>Status</th></tr></thead>
+        <tbody id="acceptedBody"><tr><td colspan="6" class="empty-row"><i class="fas fa-inbox"></i> No accepted trips yet</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ====== COMPLETED TRIPS SECTION ====== -->
+  <section class="dash-section" id="section-completed" style="display:none;">
+    <div class="section-toolbar">
+      <h3 class="section-heading"><i class="fas fa-flag-checkered"></i> Completed Trips</h3>
+      <span class="section-badge" id="completedCount">0 trips</span>
+    </div>
+    <div class="data-table-wrap">
+      <table class="data-table" id="completedTable">
+        <thead><tr><th>Booking ID</th><th>Tour</th><th>Customer</th><th>Completed On</th><th>Earnings</th><th>Payout</th></tr></thead>
+        <tbody id="completedBody"><tr><td colspan="6" class="empty-row"><i class="fas fa-inbox"></i> No completed trips yet</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ====== PAYOUTS SECTION ====== -->
+  <section class="dash-section" id="section-payouts" style="display:none;">
+    <div class="section-toolbar">
+      <h3 class="section-heading"><i class="fas fa-wallet"></i> Payouts</h3>
+    </div>
+    <div class="payouts-summary">
+      <div class="payout-card">
+        <div class="payout-icon" style="background:rgba(52,211,153,0.1);color:#34d399"><i class="fas fa-check-circle"></i></div>
+        <div><p class="payout-label">Total Earned</p><p class="payout-value" id="totalEarned">₹0</p></div>
+      </div>
+      <div class="payout-card">
+        <div class="payout-icon" style="background:rgba(255,77,77,0.1);color:#ff4d4d"><i class="fas fa-clock"></i></div>
+        <div><p class="payout-label">Pending Payout</p><p class="payout-value" id="pendingPayout">₹0</p></div>
+      </div>
+      <div class="payout-card">
+        <div class="payout-icon" style="background:rgba(102,126,234,0.1);color:#667eea"><i class="fas fa-coins"></i></div>
+        <div><p class="payout-label">Paid Out</p><p class="payout-value" id="paidOut">₹0</p></div>
+      </div>
+    </div>
+    <div class="data-table-wrap" style="margin-top:24px">
+      <table class="data-table">
+        <thead><tr><th>Booking ID</th><th>Tour</th><th>Commission</th><th>Payout Status</th><th>Date</th></tr></thead>
+        <tbody id="payoutsBody"><tr><td colspan="5" class="empty-row"><i class="fas fa-inbox"></i> No payout records yet</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ====== COMMISSION SECTION ====== -->
+  <section class="dash-section" id="section-commission" style="display:none;">
+    <div class="section-toolbar">
+      <h3 class="section-heading"><i class="fas fa-percentage"></i> Commission Structure</h3>
+    </div>
+    <div class="commission-info-grid">
+      <div class="commission-card">
+        <div class="commission-icon"><i class="fas fa-percentage"></i></div>
+        <h4>Standard Rate</h4>
+        <p class="commission-rate">10%</p>
+        <p class="commission-desc">Per completed booking</p>
+      </div>
+      <div class="commission-card">
+        <div class="commission-icon" style="background:rgba(0,212,180,0.1);color:#00d4b4"><i class="fas fa-star"></i></div>
+        <h4>Premium Rate</h4>
+        <p class="commission-rate" style="color:#00d4b4">15%</p>
+        <p class="commission-desc">For 10+ monthly trips</p>
+      </div>
+      <div class="commission-card">
+        <div class="commission-icon" style="background:rgba(245,200,66,0.1);color:#f5c842"><i class="fas fa-crown"></i></div>
+        <h4>Elite Rate</h4>
+        <p class="commission-rate" style="color:#f5c842">20%</p>
+        <p class="commission-desc">For 25+ monthly trips</p>
+      </div>
+    </div>
+    <div class="data-table-wrap" style="margin-top:30px">
+      <h4 style="margin-bottom:16px;color:var(--text-secondary)">Commission History</h4>
+      <table class="data-table">
+        <thead><tr><th>Month</th><th>Trips</th><th>Rate</th><th>Gross Earnings</th><th>Commission</th></tr></thead>
+        <tbody id="commissionBody"><tr><td colspan="5" class="empty-row"><i class="fas fa-inbox"></i> No commission history yet</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ====== CUSTOMERS SECTION ====== -->
+  <section class="dash-section" id="section-customers" style="display:none;">
+    <div class="section-toolbar">
+      <h3 class="section-heading"><i class="fas fa-users"></i> Customers</h3>
+      <span class="section-badge" id="customersCount">0 customers</span>
+    </div>
+    <div class="data-table-wrap">
+      <table class="data-table" id="customersTable">
+        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Tour Booked</th><th>Booking Date</th><th>Status</th></tr></thead>
+        <tbody id="customersBody"><tr><td colspan="6" class="empty-row"><i class="fas fa-inbox"></i> No customer records yet</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ====== PROFILE SECTION ====== -->
+  <section class="dash-section" id="section-profile" style="display:none;">
+    <div class="section-toolbar">
+      <h3 class="section-heading"><i class="fas fa-user-circle"></i> My Profile</h3>
+    </div>
+    <div class="profile-layout">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar" id="profileAvatar"><i class="fas fa-user"></i></div>
+        <h3 id="profileName" class="profile-name">Vendor Name</h3>
+        <p id="profileRole" class="profile-role">Travel Partner</p>
+        <span class="profile-badge"><i class="fas fa-check-circle"></i> Verified Vendor</span>
+      </div>
+      <div class="profile-details">
+        <div class="profile-field"><label>Full Name</label><p id="pf-name">—</p></div>
+        <div class="profile-field"><label>Company Name</label><p id="pf-company">—</p></div>
+        <div class="profile-field"><label>Email</label><p id="pf-email">—</p></div>
+        <div class="profile-field"><label>Phone</label><p id="pf-phone">—</p></div>
+        <div class="profile-field"><label>Specialization</label><p id="pf-spec">—</p></div>
+        <div class="profile-field"><label>Region</label><p id="pf-region">—</p></div>
+        <div class="profile-field"><label>Member Since</label><p id="pf-since">—</p></div>
+        <div class="profile-field"><label>Account Status</label><p id="pf-status" style="color:#34d399">Active</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== SETTINGS SECTION ====== -->
+  <section class="dash-section" id="section-settings" style="display:none;">
+    <div class="section-toolbar">
+      <h3 class="section-heading"><i class="fas fa-cog"></i> Settings</h3>
+    </div>
+    <div class="settings-grid">
+      <div class="settings-group">
+        <h4 class="settings-group-title">Appearance</h4>
+        <div class="settings-item">
+          <div>
+            <p class="settings-label">Dark Mode</p>
+            <p class="settings-desc">Toggle between light and dark theme</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="settingsThemeToggle">
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <div class="settings-group">
+        <h4 class="settings-group-title">Notifications</h4>
+        <div class="settings-item">
+          <div>
+            <p class="settings-label">New Trip Alerts</p>
+            <p class="settings-desc">Get notified when a new trip is assigned</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="notifTrips" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <div class="settings-item">
+          <div>
+            <p class="settings-label">Payout Alerts</p>
+            <p class="settings-desc">Get notified on payout processed</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="notifPayouts" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <div class="settings-group">
+        <h4 class="settings-group-title">Account</h4>
+        <div class="settings-item">
+          <div>
+            <p class="settings-label">Logout</p>
+            <p class="settings-desc">Sign out from vendor portal</p>
+          </div>
+          <button class="btn btn-danger" onclick="vendorLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </main>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Modal Skeleton -->
+  <div class="modal" id="genericModal">
+    <div class="modal-content">
+      <span class="close" id="modalClose">&times;</span>
+      <div class="modal-body" id="modalBody">
+        <!-- Dynamic modal content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Vendor JS -->
+  <script src="js/vendor-api.js"></script>
+  <script src="js/vendor-toast.js"></script>
+  <script src="js/vendor-mock.js"></script>
+  <script src="js/vendor.js"></script>
 </body>
 </html>

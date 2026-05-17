@@ -57,7 +57,7 @@ const authHeader = () => ({
 const navItems    = document.querySelectorAll('.nav-item');
 const tabContents = document.querySelectorAll('.tab-content');
 const pageTitle   = document.getElementById('page-title');
-const tabNames    = { dashboard: 'Dashboard', tours: 'Manage Tours', bookings: 'Bookings' };
+const tabNames    = { dashboard: 'Dashboard', tours: 'Manage Tours', vendors: 'Vendor Management', bookings: 'Bookings' };
 
 navItems.forEach(item => {
     item.addEventListener('click', (e) => {
@@ -377,6 +377,166 @@ document.addEventListener('DOMContentLoaded', () => {
     if (vendorFilter) vendorFilter.addEventListener('change', applyBookingsFilter);
 });
 
+// ============================================================
+//  VENDOR MANAGEMENT
+// ============================================================
+let allVendors = [];
+let currentVendorView = 'all';
+
+const loadVendors = async () => {
+    try {
+        const res  = await fetch(`${API}/admin/vendors/all`, { headers: authHeader() });
+        const json = await res.json();
+        allVendors = json.data || [];
+
+        // Count pending vendors
+        const pendingCount = allVendors.filter(v => v.approvalStatus === 'pending').length;
+        document.getElementById('pending-badge').textContent = pendingCount;
+
+        displayVendors(currentVendorView);
+    } catch (err) {
+        console.error('Load vendors error:', err);
+    }
+};
+
+window.switchVendorView = (view) => {
+    currentVendorView = view;
+    
+    // Update button styles
+    document.querySelectorAll('.vendor-tab-btn').forEach(btn => {
+        btn.style.color = 'var(--text-muted)';
+        btn.style.borderBottomColor = 'transparent';
+    });
+    event.target.closest('.vendor-tab-btn').style.color = 'var(--teal)';
+    event.target.closest('.vendor-tab-btn').style.borderBottomColor = 'var(--teal)';
+    
+    displayVendors(view);
+};
+
+const displayVendors = (filterBy) => {
+    const tbody = document.getElementById('vendors-table-body');
+    let vendors = allVendors;
+
+    if (filterBy === 'pending') {
+        vendors = allVendors.filter(v => v.approvalStatus === 'pending');
+    } else if (filterBy === 'approved') {
+        vendors = allVendors.filter(v => v.approvalStatus === 'approved');
+    } else if (filterBy === 'rejected') {
+        vendors = allVendors.filter(v => v.approvalStatus === 'rejected');
+    }
+
+    if (vendors.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--text-muted);">No vendors found in this category.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = vendors.map(v => `
+        <tr>
+            <td><strong>${v.fullName}</strong></td>
+            <td>${v.companyName || '—'}</td>
+            <td>${v.email}</td>
+            <td>${v.phone}</td>
+            <td>${v.region || '—'}</td>
+            <td>${statusBadge(v.approvalStatus)}</td>
+            <td>${statusBadge(v.activeStatus)}</td>
+            <td>${v.commissionRate}%</td>
+            <td>
+                <div class="action-btns">
+                    ${v.approvalStatus === 'pending' ? `
+                        <button class="btn btn-sm btn-approve" onclick="approveVendor('${v._id}')"><i class="fas fa-check"></i> Approve</button>
+                        <button class="btn btn-sm btn-delete" onclick="rejectVendorUI('${v._id}', '${v.fullName}')"><i class="fas fa-times"></i> Reject</button>
+                    ` : `
+                        ${v.activeStatus === 'active' ? `
+                            <button class="btn btn-sm btn-delete" onclick="deactivateVendor('${v._id}', '${v.fullName}')"><i class="fas fa-ban"></i> Suspend</button>
+                        ` : `
+                            <button class="btn btn-sm btn-approve" onclick="activateVendor('${v._id}', '${v.fullName}')"><i class="fas fa-check"></i> Activate</button>
+                        `}
+                    `}
+                </div>
+            </td>
+        </tr>
+    `).join('');
+};
+
+window.approveVendor = async (vendorId) => {
+    const vendor = allVendors.find(v => v._id === vendorId);
+    if (!confirm(`Approve ${vendor.fullName}? They can login and receive bookings after approval.`)) return;
+
+    try {
+        const res = await fetch(`${API}/admin/vendors/${vendorId}/approve`, {
+            method: 'PUT',
+            headers: authHeader()
+        });
+        const json = await res.json();
+        if (!res.ok || !json.success) throw new Error(json.message || 'Approval failed');
+
+        showToast(`✓ ${vendor.fullName} approved and activated!`);
+        loadVendors();
+    } catch (err) {
+        showToast(err.message, 'error');
+    }
+};
+
+window.rejectVendorUI = (vendorId, vendorName) => {
+    const reason = prompt(`Reason for rejecting ${vendorName}?`);
+    if (!reason) return;
+    
+    rejectVendor(vendorId, reason, vendorName);
+};
+
+const rejectVendor = async (vendorId, reason, vendorName) => {
+    try {
+        const res = await fetch(`${API}/admin/vendors/${vendorId}/reject`, {
+            method: 'PUT',
+            headers: authHeader(),
+            body: JSON.stringify({ reason })
+        });
+        const json = await res.json();
+        if (!res.ok || !json.success) throw new Error(json.message || 'Rejection failed');
+
+        showToast(`✗ ${vendorName} rejected`);
+        loadVendors();
+    } catch (err) {
+        showToast(err.message, 'error');
+    }
+};
+
+window.deactivateVendor = async (vendorId, vendorName) => {
+    const reason = prompt(`Why suspend ${vendorName}?`);
+    if (!reason) return;
+
+    try {
+        const res = await fetch(`${API}/admin/vendors/${vendorId}/deactivate`, {
+            method: 'PUT',
+            headers: authHeader(),
+            body: JSON.stringify({ reason })
+        });
+        const json = await res.json();
+        if (!res.ok || !json.success) throw new Error(json.message || 'Suspension failed');
+
+        showToast(`${vendorName} suspended`);
+        loadVendors();
+    } catch (err) {
+        showToast(err.message, 'error');
+    }
+};
+
+window.activateVendor = async (vendorId, vendorName) => {
+    try {
+        const res = await fetch(`${API}/admin/vendors/${vendorId}/activate`, {
+            method: 'PUT',
+            headers: authHeader()
+        });
+        const json = await res.json();
+        if (!res.ok || !json.success) throw new Error(json.message || 'Activation failed');
+
+        showToast(`${vendorName} reactivated`);
+        loadVendors();
+    } catch (err) {
+        showToast(err.message, 'error');
+    }
+};
+
 // Admin Approve / Reject (NO prompt — clean API calls only)
 window.adminBookingAction = async (id, action) => {
     const label = action === 'approve' ? 'Approve' : 'Reject';
@@ -468,14 +628,14 @@ const fetchAndPopulateVendors = async () => {
         _allVendors = json.data || [];
 
         if (_allVendors.length === 0) {
-            dropdown.innerHTML = '<option value="">No vendors registered</option>';
+            dropdown.innerHTML = '<option value="">No approved vendors available</option>';
             document.getElementById('no-vendors-msg').style.display = 'flex';
             return;
         }
 
         dropdown.innerHTML = `
             <option value="">— Select a vendor —</option>
-            ${_allVendors.map(v => `<option value="${v._id}">${v.name} (${v.email})</option>`).join('')}
+            ${_allVendors.map(v => `<option value="${v._id}">${v.fullName} - ${v.companyName}</option>`).join('')}
         `;
         dropdown.disabled = false;
 
@@ -502,10 +662,10 @@ window.onVendorDropdownChange = () => {
     }
 
     // Populate vendor card
-    const initial = vendor.name.charAt(0).toUpperCase();
+    const initial = vendor.fullName.charAt(0).toUpperCase();
     document.getElementById('vendor-card-avatar').textContent = initial;
-    document.getElementById('vendor-card-name').textContent   = vendor.name;
-    document.getElementById('vendor-card-email').textContent  = vendor.email;
+    document.getElementById('vendor-card-name').textContent   = vendor.fullName;
+    document.getElementById('vendor-card-email').textContent  = vendor.phone || vendor.email;
     card.style.display = 'flex';
 
     // Animate in
@@ -513,9 +673,10 @@ window.onVendorDropdownChange = () => {
     card.offsetHeight;   // force reflow
     card.style.animation = '';
 
-    // Commission preview
-    const vendorShare   = Math.round(_modalBookingPrice * 0.80);
-    const platformShare = Math.round(_modalBookingPrice * 0.20);
+    // Commission preview (use vendor's commission rate)
+    const commissionRate = (vendor.commissionRate || 80) / 100;
+    const vendorShare   = Math.round(_modalBookingPrice * commissionRate);
+    const platformShare = Math.round(_modalBookingPrice * (1 - commissionRate));
     document.getElementById('cp-total').textContent    = formatPrice(_modalBookingPrice);
     document.getElementById('cp-vendor').textContent   = formatPrice(vendorShare);
     document.getElementById('cp-platform').textContent = formatPrice(platformShare);
@@ -565,4 +726,5 @@ window.confirmVendorAssignment = async () => {
 // ============================================================
 loadDashboard();
 loadTours();
+loadVendors();
 loadBookings();

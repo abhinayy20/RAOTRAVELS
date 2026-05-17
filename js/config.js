@@ -4,8 +4,15 @@
 // ============================================================
 
 const CONFIG = {
-    // ✅ Live backend on Render — local dev falls back to localhost:5000
-    API_BASE: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:5000'
-        : 'https://raotravels-backend.onrender.com'
+    // ✅ Central dynamic API configuration
+    API_BASE: (() => {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return 'http://localhost:5000';
+        }
+        if (window.location.protocol === 'file:') {
+            return 'https://raotravels-backend.onrender.com';
+        }
+        // Co-located production deployments (e.g. Docker, Kubernetes, Nginx proxies)
+        return window.location.origin;
+    })()
 };

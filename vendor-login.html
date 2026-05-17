@@ -283,7 +283,10 @@
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
 
                 try {
-                    const res = await fetch('https://raotravels-backend.onrender.com/api/vendor/login', {
+                    const apiBase = (typeof CONFIG !== 'undefined' && CONFIG.API_BASE)
+                        ? `${CONFIG.API_BASE}/api`
+                        : 'https://raotravels-backend.onrender.com/api';
+                    const res = await fetch(`${apiBase}/vendor/login`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ email, password })

@@ -348,6 +348,7 @@
         </div>
     </div>
 
+    <script src="js/config.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('register-form');
@@ -380,7 +381,10 @@
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
 
                 try {
-                    const res = await fetch('https://raotravels-backend.onrender.com/api/vendor/register', {
+                    const apiBase = (typeof CONFIG !== 'undefined' && CONFIG.API_BASE)
+                        ? `${CONFIG.API_BASE}/api`
+                        : 'https://raotravels-backend.onrender.com/api';
+                    const res = await fetch(`${apiBase}/vendor/register`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({

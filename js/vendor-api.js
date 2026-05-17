@@ -2,7 +2,9 @@
 //  vendor-api.js - API utility functions for vendor dashboard
 // ============================================================
 
-const API_BASE = 'https://raotravels-backend.onrender.com/api';
+const API_BASE = (typeof CONFIG !== 'undefined' && CONFIG.API_BASE)
+    ? `${CONFIG.API_BASE}/api`
+    : 'https://raotravels-backend.onrender.com/api';
 
 // Get vendor token from localStorage
 const getVendorToken = () => localStorage.getItem('vendorToken');

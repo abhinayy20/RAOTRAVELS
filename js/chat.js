@@ -7,7 +7,7 @@
 (function () {
     'use strict';
 
-    const AI_ENDPOINT = (window.CONFIG?.API_BASE || 'https://raotravels-backend.onrender.com') + '/api/ai/chat';
+    const AI_ENDPOINT = (typeof CONFIG !== 'undefined' ? CONFIG.API_BASE : 'https://raotravels-backend.onrender.com') + '/api/ai/chat';
 
     // Conversation history for multi-turn context
     let history = [];

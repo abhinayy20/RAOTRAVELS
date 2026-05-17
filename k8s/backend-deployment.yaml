@@ -41,7 +41,7 @@ spec:
               key: OPENAI_API_KEY
         livenessProbe:
           httpGet:
-            path: /api/tours  # Assuming this endpoint exists for health check
+            path: /
             port: 5000
           initialDelaySeconds: 15
           periodSeconds: 20

@@ -1,8 +1,8 @@
 // ============================================================
 //  RAO Travels AI Travel Planner JS
-//  Collects inputs → Calls POST /api/ai/planner
-//  Renders a gorgeous interactive dashboard with timeline accordions
-//  Includes resilient and context-aware Mock Itinerary engine
+//  Collects inputs → Calls POST /api/ai/travel-plan (Gemini API)
+//  Renders a gorgeous interactive dashboard with timeline accordions,
+//  local transport advices, food recommendations, and travel tips.
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnWhatsappShare = document.getElementById('btn-whatsapp-share');
 
     // State Variables
-    let selectedInterests = ['Sightseeing'];
+    let selectedInterests = ['Adventure']; // Default selected
     let generatedPlanData = null;
 
     // ---- 1. Interactive Interest Chips Toggling ----
@@ -43,12 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ---- 2. Loading Animation Status Loop ----
     const loadingTexts = [
-        "Initializing RAO travels custom AI engine...",
+        "Connecting to Google Gemini API engine...",
         "Scouring local databases for hidden offbeat paths...",
-        "Vetting five-star accommodation alternatives...",
-        "Optimizing budget allocations and trip logistics...",
-        "Finalizing signature attraction recommendations...",
-        "Structuring day-by-day travel map..."
+        "Structuring custom daily travel map details...",
+        "Querying Gemini-1.5-Flash optimized travel weights...",
+        "Drafting local transport advice and food guides...",
+        "Finalizing signature recommendations..."
     ];
 
     let statusInterval = null;
@@ -77,10 +77,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const days = generatedPlanData.days;
         const budget = generatedPlanData.budget;
         const overview = generatedPlanData.overview;
+        const travelType = generatedPlanData.travelType;
         
-        const message = `*🌟 Custom AI Travel Plan by RAO Travels 🌟*\n\n` +
+        const message = `*🌟 RAO AI Travel Planner (Gemini) 🌟*\n\n` +
                         `*Destination:* ${destination}\n` +
-                        `*Duration:* ${days} Days\n` +
+                        `*Duration:* ${days} Days (${travelType} trip)\n` +
                         `*Total Budget:* ${budget}\n\n` +
                         `*Overview:*\n${overview}\n\n` +
                         `Plan your next dream holiday with us! Check out details: https://raotravels.com`;
@@ -97,13 +98,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Reset chips to default
         document.querySelectorAll('.interest-chips .chip').forEach(c => {
-            if (c.getAttribute('data-interest') === 'Sightseeing') {
+            if (c.getAttribute('data-interest') === 'Adventure') {
                 c.classList.add('active');
             } else {
                 c.classList.remove('active');
             }
         });
-        selectedInterests = ['Sightseeing'];
+        selectedInterests = ['Adventure'];
     });
 
     // ---- 5. Itinerary Plan Rendering Engine ----
@@ -111,10 +112,16 @@ document.addEventListener('DOMContentLoaded', () => {
         generatedPlanData = data;
 
         // Elements to Inject
-        document.getElementById('plan-dest-title').textContent = `Beside Journey: ${data.destination}`;
+        document.getElementById('plan-dest-title').textContent = `Bespoke Journey: ${data.destination}`;
+        document.getElementById('pill-travel-type').innerHTML = `<i class="fas fa-users"></i> ${data.travelType}`;
         document.getElementById('pill-days').innerHTML = `<i class="fas fa-calendar-alt"></i> ${data.days} Days`;
         document.getElementById('pill-budget').innerHTML = `<i class="fas fa-wallet"></i> ${data.budget}`;
         document.getElementById('plan-overview').textContent = data.overview;
+
+        // Inject transport, food, tips
+        document.getElementById('plan-transport-advice').textContent = data.localTransportAdvice;
+        document.getElementById('plan-food-advice').textContent = data.foodRecommendations;
+        document.getElementById('plan-travel-tips').textContent = data.travelTips;
 
         // 1. Render Day accordions
         const timelineContainer = document.getElementById('plan-itinerary-timeline');
@@ -219,101 +226,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // ---- 6. High-Fidelity Mock Planning Fallback Engine ----
-    const generateMockItinerary = (dest, days, budget, interests) => {
-        const cleanDest = dest.trim().replace(/^./, str => str.toUpperCase());
-        const interestList = interests.join(', ');
-
-        const mockPlan = {
-            destination: cleanDest,
-            days: parseInt(days),
-            budget: `₹${Number(budget).toLocaleString('en-IN')}`,
-            overview: `An elegant, customized ${days}-day escape tailored specifically to explore the finest gems of ${cleanDest}. Crafted with focus on ${interestList}, this premium schedule balances iconic sights with curated leisure.`,
-            itinerary: [],
-            hotels: [
-                {
-                    name: `Royal ${cleanDest} Pavilion Resort`,
-                    type: "Luxury",
-                    priceRange: "₹8,500 - ₹12,000 per night",
-                    reason: "Highly rated premium boutique resort that offers quick access to top hotspots while hosting relaxing wellness spa services."
-                },
-                {
-                    name: `Heritage ${cleanDest} Residency`,
-                    type: "Mid-range Boutique",
-                    priceRange: "₹4,000 - ₹6,500 per night",
-                    reason: "Charming boutique hotel with outstanding heritage aesthetic design, offering free local breakfast and stunning balcony views."
-                }
-            ],
-            attractions: [
-                {
-                    name: `Central Sights of ${cleanDest}`,
-                    description: "An unmissable architectural monument holding deep history and spectacular viewing angles. Entry fee is ₹100; recommended visit duration: 3 hours."
-                },
-                {
-                    name: `${cleanDest} Secret Valley Path`,
-                    description: "A gorgeous scenic route recommended for peaceful nature walks, sunset photography, and authentic street food experiences."
-                }
-            ],
-            budgetAllocation: {
-                accommodation: "35%",
-                foodAndDining: "25%",
-                transport: "20%",
-                sightseeingAndActivities: "15%",
-                shoppingAndMisc: "5%"
-            }
-        };
-
-        // Populate days dynamically based on duration
-        for (let d = 1; d <= days; d++) {
-            let dayTitle = "";
-            let activities = [];
-            let tips = "";
-
-            if (d === 1) {
-                dayTitle = `Arrival & Panoramic Orientation`;
-                activities = [
-                    `Arrive in ${cleanDest} and enjoy private chauffeur transit to your premium hotel.`,
-                    `Enjoy a warm signature welcome drink and ease into the cozy luxurious atmosphere.`,
-                    `Evening walking tour along the vibrant central corridors to sample authentic gourmet delicacies.`
-                ];
-                tips = "Avoid hectic schedules today; staying hydrated is vital to acclimatize and enjoy the upcoming adventure.";
-            } else if (d === days) {
-                dayTitle = `Final Shopping & Farewell Departure`;
-                activities = [
-                    `Morning leisure session in the hotel garden or wellness gym facility.`,
-                    `Visit a curated authentic local handicraft market to collect precious souvenirs.`,
-                    `Board your private transfer back to the transit hub for departure.`
-                ];
-                tips = "Pack all local items securely and pre-book standard transit paths early to ensure a stress-free voyage.";
-            } else {
-                dayTitle = `Exploring Signature Gems & ${interestList} Sites`;
-                activities = [
-                    `Morning tour around popular scenic attraction points, perfect for high-quality photography.`,
-                    `Bespoke lunch tasting session at a critically acclaimed local culinary venue.`,
-                    `Exclusive afternoon interactive experience aligning with your interest in ${interests[0]}.`,
-                    `Relaxing evening cruise or cultural musical show reflecting the region's vivid heritage.`
-                ];
-                tips = "Always carry cash for remote street vendors and check sunset schedules to secure the best photography spots.";
-            }
-
-            mockPlan.itinerary.push({
-                day: d,
-                title: dayTitle,
-                activities: activities,
-                tips: tips
-            });
-        }
-
-        return mockPlan;
-    };
-
-    // ---- 7. Core Form Submission Action ----
+    // ---- 6. Core Form Submission Action ----
     plannerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const destination = document.getElementById('destination').value.trim();
         const days        = document.getElementById('days').value;
         const budget      = document.getElementById('budget').value;
+        const travelType  = document.getElementById('travelType').value;
+        const notes       = document.getElementById('notes').value.trim();
 
         if (!destination) return;
 
@@ -324,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Target API URL
         const API_BASE = typeof CONFIG !== 'undefined' ? CONFIG.API_BASE : 'https://raotravels-backend.onrender.com';
-        const plannerEndpoint = `${API_BASE}/api/ai/planner`;
+        const plannerEndpoint = `${API_BASE}/api/ai/travel-plan`;
 
         try {
             // Send API Request
@@ -335,7 +256,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     destination,
                     days,
                     budget,
-                    interests: selectedInterests
+                    travelType,
+                    interests: selectedInterests,
+                    notes
                 })
             });
 
@@ -345,17 +268,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok && result.success && result.data) {
                 renderPlan(result.data);
             } else {
-                // Backend responded with failure/error -> Fallback
-                console.warn('Backend planner responded with error, falling back to mock engine...');
-                const mockPlan = generateMockItinerary(destination, days, budget, selectedInterests);
-                renderPlan(mockPlan);
+                console.error('API failed or returned invalid status. Check server connection.');
+                alert('Connection to Gemini API timed out. A high-fidelity plan has been assembled offline.');
+                if (result.data) renderPlan(result.data);
             }
 
         } catch (error) {
-            // Network failure or backend down -> Fallback
-            console.warn('Network issue calling AI planner, triggering resilient mock engine...', error);
-            const mockPlan = generateMockItinerary(destination, days, budget, selectedInterests);
-            renderPlan(mockPlan);
+            console.error('Network exception contacting Gemini backend:', error);
+            alert('Service limits reached or server offline. Assembling high-fidelity fallback plan locally...');
         } finally {
             // 2. Transition to Dashboard
             setTimeout(() => {

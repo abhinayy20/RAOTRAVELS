@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <title>AI Smart Travel Planner | RAO TRAVELS</title>
+    <title>RAO AI Travel Planner | RAO TRAVELS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -38,9 +38,9 @@
         
         <!-- Planner Header -->
         <header class="planner-header">
-            <div class="badge"><i class="fas fa-sparkles"></i> Next-Gen AI</div>
+            <div class="badge"><i class="fas fa-sparkles"></i> RAO AI Travel Planner</div>
             <h1>Smart AI Travel Planner</h1>
-            <p>Enter your travel desires and watch our artificial intelligence build your dream, bespoke itinerary in seconds.</p>
+            <p>Describe your perfect holiday and let our advanced Google Gemini API engine draft an optimized, bespoke travel blueprint in real-time.</p>
         </header>
 
         <!-- Dynamic Form Section -->
@@ -49,8 +49,8 @@
                 <div class="form-grid">
                     <!-- Destination -->
                     <div class="form-group full-width">
-                        <label for="destination"><i class="fas fa-map-marker-alt"></i> Where do you want to explore?</label>
-                        <input type="text" id="destination" placeholder="e.g. Leh-Ladakh, Bali, Swiss Alps, Kerala..." required>
+                        <label for="destination"><i class="fas fa-map-marker-alt"></i> Destination Location</label>
+                        <input type="text" id="destination" placeholder="e.g. Kashmir, Bali, Dubai, Switzerland, Kerala..." required>
                     </div>
 
                     <!-- Days -->
@@ -71,23 +71,41 @@
                         <input type="number" id="budget" min="5000" max="1000000" value="50000" step="5000" placeholder="e.g. 50000" required>
                     </div>
 
-                    <!-- Interests -->
+                    <!-- Travel Group Type -->
+                    <div class="form-group full-width">
+                        <label for="travelType"><i class="fas fa-users"></i> Travel Group Type</label>
+                        <select id="travelType" required style="width: 100%; box-sizing: border-box; background: rgba(13, 17, 27, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 14px 18px; color: var(--text-white);">
+                            <option value="Solo" selected>Solo Traveler</option>
+                            <option value="Couple">Couple Getaway</option>
+                            <option value="Family">Family Holiday</option>
+                            <option value="Friends">Friends Group Trip</option>
+                        </select>
+                    </div>
+
+                    <!-- Interests Multi-Select -->
                     <div class="form-group full-width">
                         <label><i class="fas fa-heart"></i> Select Your Travel Interests</label>
                         <div class="interest-chips" id="interest-chips">
-                            <div class="chip active" data-interest="Sightseeing"><i class="fas fa-binoculars"></i> Sightseeing</div>
-                            <div class="chip" data-interest="Adventure"><i class="fas fa-mountain"></i> Adventure</div>
-                            <div class="chip" data-interest="Culture & Heritage"><i class="fas fa-landmark"></i> Culture & History</div>
-                            <div class="chip" data-interest="Local Food & Dining"><i class="fas fa-utensils"></i> Foodie</div>
-                            <div class="chip" data-interest="Nature & Relaxation"><i class="fas fa-leaf"></i> Nature</div>
-                            <div class="chip" data-interest="Luxury & Spa"><i class="fas fa-spa"></i> Luxury</div>
+                            <div class="chip active" data-interest="Adventure"><i class="fas fa-mountain"></i> Adventure</div>
+                            <div class="chip" data-interest="Nature"><i class="fas fa-leaf"></i> Nature</div>
+                            <div class="chip" data-interest="Food"><i class="fas fa-utensils"></i> Food</div>
+                            <div class="chip" data-interest="Luxury"><i class="fas fa-spa"></i> Luxury</div>
+                            <div class="chip" data-interest="Spiritual"><i class="fas fa-om"></i> Spiritual</div>
+                            <div class="chip" data-interest="Beach"><i class="fas fa-umbrella-beach"></i> Beach</div>
+                            <div class="chip" data-interest="Culture"><i class="fas fa-landmark"></i> Culture</div>
                             <div class="chip" data-interest="Shopping"><i class="fas fa-shopping-bag"></i> Shopping</div>
                         </div>
+                    </div>
+
+                    <!-- Optional Preferences/Notes -->
+                    <div class="form-group full-width">
+                        <label for="notes"><i class="fas fa-pen-nib"></i> Additional Preferences / Custom Notes (Optional)</label>
+                        <textarea id="notes" placeholder="e.g. Vegetarian food options only, senior-citizen friendly walks, slow-paced sightseeing, include adventure sports..." rows="3" style="width: 100%; box-sizing: border-box; background: rgba(13, 17, 27, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 14px 18px; color: var(--text-white); font-family: var(--font-inter); outline: none; transition: all 0.3s;"></textarea>
                     </div>
                 </div>
 
                 <button type="submit" class="btn-generate">
-                    <i class="fas fa-wand-magic-sparkles"></i> Build Custom Itinerary
+                    <i class="fas fa-wand-magic-sparkles"></i> Generate AI Travel Plan
                 </button>
             </form>
         </section>
@@ -102,7 +120,7 @@
                     <i class="fas fa-brain ai-brain-icon"></i>
                 </div>
             </div>
-            <h2>Crafting Your Masterpiece...</h2>
+            <h2>Consulting Google Gemini AI Engine...</h2>
             <p id="loading-status">Curating offbeat local gems...</p>
         </section>
 
@@ -115,15 +133,16 @@
                     <i class="fas fa-arrow-left"></i> Plan Another Trip
                 </button>
                 <button class="btn-whatsapp" id="btn-whatsapp-share">
-                    <i class="fab fa-whatsapp"></i> Share on WhatsApp
+                    <i class="fab fa-whatsapp"></i> Share Plan via WhatsApp
                 </button>
             </div>
 
             <!-- Overview Banner -->
             <div class="overview-banner">
                 <div class="banner-meta">
-                    <h2 id="plan-dest-title">Trip to Ladakh</h2>
+                    <h2 id="plan-dest-title">Trip to Kashmir</h2>
                     <div class="meta-pills">
+                        <span id="pill-travel-type"><i class="fas fa-users"></i> Couple</span>
                         <span id="pill-days"><i class="fas fa-calendar-alt"></i> 5 Days</span>
                         <span id="pill-budget"><i class="fas fa-wallet"></i> ₹50,000</span>
                     </div>
@@ -144,12 +163,12 @@
                     </div>
                 </div>
 
-                <!-- Right Column: Hotels, Attractions, Budget Allocation -->
+                <!-- Right Column: Hotels, Attractions, Transport, Food, Tips -->
                 <div class="grid-right">
                     
                     <!-- Hotels Card -->
                     <div class="section-card">
-                        <h3 class="section-title"><i class="fas fa-hotel"></i> Curated Accommodations</h3>
+                        <h3 class="section-title"><i class="fas fa-hotel"></i> Suggested Accommodations</h3>
                         <div class="hotels-list" id="plan-hotels">
                             <!-- Injected dynamically -->
                         </div>
@@ -157,10 +176,28 @@
 
                     <!-- Must Visits -->
                     <div class="section-card">
-                        <h3 class="section-title"><i class="fas fa-map-marked-alt"></i> Signature Attractions</h3>
+                        <h3 class="section-title"><i class="fas fa-map-marked-alt"></i> Must-Visit Attractions</h3>
                         <div class="attractions-grid" id="plan-attractions">
                             <!-- Injected dynamically -->
                         </div>
+                    </div>
+
+                    <!-- Transport Advice -->
+                    <div class="section-card">
+                        <h3 class="section-title"><i class="fas fa-bus"></i> Local Transport Advice</h3>
+                        <p id="plan-transport-advice" style="font-size: 0.88rem; line-height: 1.6; color: var(--text-white); margin: 0;"></p>
+                    </div>
+
+                    <!-- Food Recommendations -->
+                    <div class="section-card">
+                        <h3 class="section-title"><i class="fas fa-utensils"></i> Culinary & Food Recommendations</h3>
+                        <p id="plan-food-advice" style="font-size: 0.88rem; line-height: 1.6; color: var(--text-white); margin: 0;"></p>
+                    </div>
+
+                    <!-- Travel Tips -->
+                    <div class="section-card">
+                        <h3 class="section-title"><i class="fas fa-lightbulb"></i> Essential Travel Tips</h3>
+                        <p id="plan-travel-tips" style="font-size: 0.88rem; line-height: 1.6; color: var(--text-white); margin: 0;"></p>
                     </div>
 
                     <!-- Budget Allocations -->

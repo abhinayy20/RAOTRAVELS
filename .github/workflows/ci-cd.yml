@@ -32,6 +32,25 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
+      - name: Hadolint Scan Backend Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: backend/Dockerfile
+          ignore: DL3018 # Allow alpine tag overrides
+
+      - name: Hadolint Scan Frontend Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          ignore: DL3018
+
+      - name: Run Checkov Security Scan on K8s Manifests
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: k8s/
+          framework: kubernetes
+          soft_fail: true
+
   # STAGE 4 & 5: Docker Build and Trivy Scan
   build-and-scan:
     name: Build and Scan Images

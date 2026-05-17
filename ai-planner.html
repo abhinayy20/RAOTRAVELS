@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <title>AI Smart Travel Planner | RAO TRAVELS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/ai-planner.css">
+</head>
+<body>
+    <div class="bg-layer"></div>
+
+    <!-- 1. Header Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="logo">RAO<span style="color: var(--text-primary); font-weight: 300;">TRAVELS</span></div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#packages">Packages</a></li>
+            <li><a href="destinations.html">Destinations</a></li>
+            <li><a href="ai-planner.html" class="active" style="color: var(--teal) !important;"><i class="fas fa-magic"></i> AI Planner</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="my-bookings.html">My Bookings</a></li>
+            <li><a href="vendor-login.html" style="color:var(--gold, #f5c842);">Vendor Portal</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="https://wa.me/917985815601?text=Hello%20RAO%20Travels,%20I%20want%20to%20enquire%20about%20a%20tour" target="_blank" class="btn-primary" style="display:inline-block;">Enquire Now</a>
+        </div>
+    </nav>
+
+    <!-- 2. Main Planner Container -->
+    <main class="planner-container">
+        
+        <!-- Planner Header -->
+        <header class="planner-header">
+            <div class="badge"><i class="fas fa-sparkles"></i> Next-Gen AI</div>
+            <h1>Smart AI Travel Planner</h1>
+            <p>Enter your travel desires and watch our artificial intelligence build your dream, bespoke itinerary in seconds.</p>
+        </header>
+
+        <!-- Dynamic Form Section -->
+        <section class="planner-card" id="form-section">
+            <form id="planner-form">
+                <div class="form-grid">
+                    <!-- Destination -->
+                    <div class="form-group full-width">
+                        <label for="destination"><i class="fas fa-map-marker-alt"></i> Where do you want to explore?</label>
+                        <input type="text" id="destination" placeholder="e.g. Leh-Ladakh, Bali, Swiss Alps, Kerala..." required>
+                    </div>
+
+                    <!-- Days -->
+                    <div class="form-group">
+                        <label for="days"><i class="fas fa-calendar-day"></i> Trip Duration (Days)</label>
+                        <select id="days" required>
+                            <option value="3">3 Days (Weekend Getaway)</option>
+                            <option value="5" selected>5 Days (Standard Explorer)</option>
+                            <option value="7">7 Days (Week-long Escape)</option>
+                            <option value="10">10 Days (Deep Discoverer)</option>
+                            <option value="14">14 Days (Ultimate Grand Tour)</option>
+                        </select>
+                    </div>
+
+                    <!-- Budget -->
+                    <div class="form-group">
+                        <label for="budget"><i class="fas fa-wallet"></i> Total Budget (₹ INR)</label>
+                        <input type="number" id="budget" min="5000" max="1000000" value="50000" step="5000" placeholder="e.g. 50000" required>
+                    </div>
+
+                    <!-- Interests -->
+                    <div class="form-group full-width">
+                        <label><i class="fas fa-heart"></i> Select Your Travel Interests</label>
+                        <div class="interest-chips" id="interest-chips">
+                            <div class="chip active" data-interest="Sightseeing"><i class="fas fa-binoculars"></i> Sightseeing</div>
+                            <div class="chip" data-interest="Adventure"><i class="fas fa-mountain"></i> Adventure</div>
+                            <div class="chip" data-interest="Culture & Heritage"><i class="fas fa-landmark"></i> Culture & History</div>
+                            <div class="chip" data-interest="Local Food & Dining"><i class="fas fa-utensils"></i> Foodie</div>
+                            <div class="chip" data-interest="Nature & Relaxation"><i class="fas fa-leaf"></i> Nature</div>
+                            <div class="chip" data-interest="Luxury & Spa"><i class="fas fa-spa"></i> Luxury</div>
+                            <div class="chip" data-interest="Shopping"><i class="fas fa-shopping-bag"></i> Shopping</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-generate">
+                    <i class="fas fa-wand-magic-sparkles"></i> Build Custom Itinerary
+                </button>
+            </form>
+        </section>
+
+        <!-- 3. AI Generation Loading Screen -->
+        <section class="loading-card hidden" id="loading-section">
+            <div class="loader-wrapper">
+                <div class="ai-orbit">
+                    <div class="orbit-ring"></div>
+                    <div class="orbit-ring ring-two"></div>
+                    <div class="orbit-ball"></div>
+                    <i class="fas fa-brain ai-brain-icon"></i>
+                </div>
+            </div>
+            <h2>Crafting Your Masterpiece...</h2>
+            <p id="loading-status">Curating offbeat local gems...</p>
+        </section>
+
+        <!-- 4. Planner Output Dashboard -->
+        <section class="plan-dashboard hidden" id="plan-section">
+            
+            <!-- Dashboard Controls -->
+            <div class="dashboard-controls">
+                <button class="btn-back" id="btn-back-to-form">
+                    <i class="fas fa-arrow-left"></i> Plan Another Trip
+                </button>
+                <button class="btn-whatsapp" id="btn-whatsapp-share">
+                    <i class="fab fa-whatsapp"></i> Share on WhatsApp
+                </button>
+            </div>
+
+            <!-- Overview Banner -->
+            <div class="overview-banner">
+                <div class="banner-meta">
+                    <h2 id="plan-dest-title">Trip to Ladakh</h2>
+                    <div class="meta-pills">
+                        <span id="pill-days"><i class="fas fa-calendar-alt"></i> 5 Days</span>
+                        <span id="pill-budget"><i class="fas fa-wallet"></i> ₹50,000</span>
+                    </div>
+                </div>
+                <p id="plan-overview">Loading your customized trip summary...</p>
+            </div>
+
+            <!-- Main Dashboard Content Grid -->
+            <div class="dashboard-grid">
+                
+                <!-- Left Column: Itinerary Timeline -->
+                <div class="grid-left">
+                    <div class="section-card">
+                        <h3 class="section-title"><i class="fas fa-route"></i> Day-by-Day Route</h3>
+                        <div class="timeline" id="plan-itinerary-timeline">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Hotels, Attractions, Budget Allocation -->
+                <div class="grid-right">
+                    
+                    <!-- Hotels Card -->
+                    <div class="section-card">
+                        <h3 class="section-title"><i class="fas fa-hotel"></i> Curated Accommodations</h3>
+                        <div class="hotels-list" id="plan-hotels">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Must Visits -->
+                    <div class="section-card">
+                        <h3 class="section-title"><i class="fas fa-map-marked-alt"></i> Signature Attractions</h3>
+                        <div class="attractions-grid" id="plan-attractions">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Budget Allocations -->
+                    <div class="section-card">
+                        <h3 class="section-title"><i class="fas fa-chart-pie"></i> Visual Budget Allocation</h3>
+                        <div class="budget-chart" id="plan-budget-chart">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h2>RAO TRAVELS</h2>
+                <p>Curators of luxury, bespoke journeys around India and the world.</p>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 RAO TRAVELS. Crafted for Academic Excellence.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Core Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/ai-planner.js"></script>
+    <script src="js/chat.js"></script>
+</body>
+</html>
